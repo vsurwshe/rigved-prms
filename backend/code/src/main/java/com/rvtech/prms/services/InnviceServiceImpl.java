@@ -96,7 +96,7 @@ public class InnviceServiceImpl {
 
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 
-	SimpleDateFormat dateFormatAtt = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+	SimpleDateFormat dateFormatAtt = new SimpleDateFormat("yyyy-MM-dd");
 
 	@Autowired
 	private InvoiceRepository innvoiseRepository;
@@ -174,8 +174,12 @@ public class InnviceServiceImpl {
 
 						if (String.valueOf(rate).split(",")[2].equals("Daily")) {
 							rateCost = Float.valueOf(String.valueOf(rate).split(",")[0]);
-						} else if (rateObj.equals("hourly")) {
+						} else if (rateObj.equals("Hourly")) {
+							rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+									* Float.valueOf(String.valueOf(rate).split(",")[1]);
 						} else {
+							rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+									/ Float.valueOf(String.valueOf(rate).split(",")[1]);
 						}
 
 						onboardingDate = projecEmplMapping.getOnbordaingDate();
@@ -290,8 +294,12 @@ public class InnviceServiceImpl {
 
 							if (String.valueOf(rate).split(",")[2].equals("Daily")) {
 								rateCost = Float.valueOf(String.valueOf(rate).split(",")[0]);
-							} else if (rateObj.equals("Daily")) {
+							} else if (rateObj.equals("Hourly")) {
+								rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+										* Float.valueOf(String.valueOf(rate).split(",")[1]);
 							} else {
+								rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+										/ Float.valueOf(String.valueOf(rate).split(",")[1]);
 							}
 
 							onboardingDate = projecEmplMapping.getOnbordaingDate();
@@ -405,15 +413,23 @@ public class InnviceServiceImpl {
 				int dayPresent = 0;
 				int halfDay = 0;
 				// Calculating per day rate of employee based on information
-				Object rateObj = rateCardRepository.findRateById(employeMappingEntity.getRateCardId());
-				
-				
-				/*
-				 * if (rateObj[2].equals("Daily")) { rateCost = (Float) rateObj[0]; } else if
-				 * (rateObj[2].equals("Daily")) { } else { }
-				 */
-				// this line getting attendance entity
-				List<AttendanceEntity> attendanceEntities = attendanceRepository.findattendance(employeMappingEntity.getAccountId(), dateFormatAtt.format(innvoiceDto.getFromDate()),dateFormatAtt.format(innvoiceDto.getToDate()));
+				List<String> rateObj = rateCardRepository.findRateById(employeMappingEntity.getRateCardId());
+				String rate = rateObj.get(0);
+
+				if (String.valueOf(rate).split(",")[2].equals("Daily")) {
+					rateCost = Float.valueOf(String.valueOf(rate).split(",")[0]);
+				} else if (rateObj.equals("Hourly")) {
+					rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+							* Float.valueOf(String.valueOf(rate).split(",")[1]);
+				} else {
+					rateCost = Float.valueOf(String.valueOf(rate).split(",")[0])
+							/ Float.valueOf(String.valueOf(rate).split(",")[1]);
+				}
+
+				List<AttendanceEntity> attendanceEntities = attendanceRepository.findattendance(
+						employeMappingEntity.getAccountId(), dateFormatAtt.format(innvoiceDto.getFromDate()),
+						dateFormatAtt.format(innvoiceDto.getToDate()));
+
 				
 				// iterating the attendance entity
 				for (AttendanceEntity attendanceEntity : attendanceEntities) {
@@ -461,33 +477,35 @@ public class InnviceServiceImpl {
 				}
 
 			}
-			// Adding expence list
-			if (innvoiceDto.getExpList() != null && innvoiceDto.getExpList().size() > 0) {
-				for (String expId : innvoiceDto.getExpList()) {
-					innCost = expenceRepository.findExpById(expId) + innCost;
-				}
-			}
-			innvoiceDto.setTotalInvAmt(innCost);
-			innvoiseEntity = innvoiseRepository.save(GenericMapper.mapper.map(innvoiceDto, InvoiceEntity.class));
-
-			if (innvoiseEntity.getId() != null) {
+			/*
+			 * // Adding expence list if (innvoiceDto.getExpList() != null &&
+			 * innvoiceDto.getExpList().size() > 0) { for (String expId :
+			 * innvoiceDto.getExpList()) { innCost = expenceRepository.findExpById(expId) +
+			 * innCost; } } innvoiceDto.setTotalInvAmt(innCost); innvoiseEntity =
+			 * innvoiseRepository.save(GenericMapper.mapper.map(innvoiceDto,
+			 * InvoiceEntity.class));
+			 */
+			if (invoiceDetailEntities != null && !invoiceDetailEntities.isEmpty()) {
 				// For validataion if invoiceDetailEntities is empty it means attendance is not
 				// available for given time , deleting generated invoice too
-				if (invoiceDetailEntities != null && invoiceDetailEntities.isEmpty()) {
-					innvoiseRepository.delete(innvoiseEntity);
-					headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
-					headers.add(Constants.MESSAGE, "Attendance is not available");
-					responceMap.put("Status", HttpStatus.NO_CONTENT);
-					return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
-				}
+				/*
+				 * if (invoiceDetailEntities != null && invoiceDetailEntities.isEmpty()) {
+				 * innvoiseRepository.delete(innvoiseEntity); headers.add(Constants.STATUS,
+				 * HttpStatus.NO_CONTENT.toString()); headers.add(Constants.MESSAGE,
+				 * "Attendance is not available"); responceMap.put("Status",
+				 * HttpStatus.NO_CONTENT); return new ResponseEntity<>(responceMap, headers,
+				 * HttpStatus.OK); }
+				 */
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, "Innvoice generated successfully successfully");
 				responceMap.put("Status", HttpStatus.OK);
+
 				for (InvoiceDetailEntity invoiceDetailEntity : invoiceDetailEntities) {
-					invoiceDetailEntity.setInvoiceId(innvoiseEntity.getId());
-					invoiceDetailRepository.save(invoiceDetailEntity);
+					// invoiceDetailEntity.setInvoiceId(innvoiseEntity.getId());
+					// invoiceDetailRepository.save(invoiceDetailEntity);
 					invoiceDetailDtos.add(GenericMapper.mapper.map(invoiceDetailEntity, InvoiceDetailDto.class));
 				}
+
 				return new ResponseEntity<>(invoiceDetailDtos, headers, HttpStatus.OK);
 
 			} else {
@@ -574,7 +592,7 @@ public class InnviceServiceImpl {
 		invoicePDFEntity.setClientId(clientDetailsEntity.getId());
 		invoicePDFEntity.setFromDate(innvoiceDto.getFromDate());
 		invoicePDFEntity.setToDate(innvoiceDto.getToDate());
-		invoicePDFRepository.save(invoicePDFEntity);
+		invoicePDFEntity = invoicePDFRepository.save(invoicePDFEntity);
 
 		// Updating balence amount in purchase order
 		PurchaseOrderEntity purchaseOrderEntity = purchaseOrderRepository
@@ -582,7 +600,15 @@ public class InnviceServiceImpl {
 		purchaseOrderEntity.setInvAmnt(sum);
 		purchaseOrderEntity.setBalPoAmt(purchaseOrderEntity.getPoAmount() - sum);
 		purchaseOrderRepository.save(purchaseOrderEntity);
-
+		// Storing attendance details in DB
+		if (innvoiceDto.getInvoiceDetailDtos() != null && !innvoiceDto.getInvoiceDetailDtos().isEmpty()) {
+			for (InvoiceDetailDto invoiceDetailDto : innvoiceDto.getInvoiceDetailDtos()) {
+				InvoiceDetailEntity invoiceDetailEntity = new InvoiceDetailEntity();
+				invoiceDetailEntity = GenericMapper.mapper.map(invoiceDetailDto, InvoiceDetailEntity.class);
+				invoiceDetailEntity.setInvoiceId(invoicePDFEntity.getId());
+				invoiceDetailRepository.save(invoiceDetailEntity);
+			}
+		}
 		return new ResponseEntity<>(invoicePDFDto, headers, HttpStatus.OK);
 
 	}

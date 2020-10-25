@@ -12,20 +12,21 @@ services:
       - ./backend/vscode:/root/.vscode-server
     ports:
       - 9002:9002 
+      - 9003:9003
     networks:
       - prmsnet 
-  prms-forntend: 
-    container_name: prms-forntend
-    image: prms-forntend-image
-    build: 
-      context: ./forntend
-      dockerfile: Dockerfile
-    volumes:
-      - ./forntend/vscode:/root/.vscode-server
-      - ./forntend/code:/app
-    ports:
-      - 4041:5000
-    networks:
-      - prmsnet 
+  # prms-forntend: 
+  #   container_name: prms-forntend
+  #   image: prms-forntend-image
+  #   build: 
+  #     context: ./forntend
+  #     dockerfile: Dockerfile
+  #   volumes:
+  #     - ./forntend/vscode:/root/.vscode-server
+  #     - ./forntend/code:/app
+  #   ports:
+  #     - 4041:5000
+  #   networks:
+  #     - prmsnet 
 networks: 
   prmsnet:

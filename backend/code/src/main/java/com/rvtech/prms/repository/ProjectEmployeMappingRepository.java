@@ -14,16 +14,19 @@ import com.rvtech.prms.entity.ProjectEntity;
 
 public interface ProjectEmployeMappingRepository extends CrudRepository<ProjectEmployeMappingEntity, String> {
 
-	
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE ProjectEmployeMappingEntity c SET c.active=:active WHERE c.id=:id")
 	int updateActive(@Param("id") String id, @Param("active") Boolean active);
-	
+
 	Optional<ProjectEmployeMappingEntity> findById(String id);
-	
-	List<ProjectEmployeMappingEntity> findAllByActiveAndProjectIdOrRateCardId(Boolean active,String pid,String id, Pageable page);
+
+	List<ProjectEmployeMappingEntity> findAllByActiveAndProjectIdOrRateCardId(Boolean active, String pid, String id,
+			Pageable page);
 
 	List<ProjectEmployeMappingEntity> findAllByActive(Boolean active, Pageable page);
-	
+
 	List<ProjectEmployeMappingEntity> findAllByProjectId(String projectId);
+
+	@Query("SELECT count(*) FROM ProjectEmployeMappingEntity where projectId=:projectId and accountId=:accountId and active=1")
+	int countOnProjectIdAndAccountId(@Param("projectId") String projectId, @Param("accountId") String accountId);
 }

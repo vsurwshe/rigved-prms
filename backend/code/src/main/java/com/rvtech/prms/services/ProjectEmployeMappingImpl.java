@@ -94,17 +94,39 @@ public class ProjectEmployeMappingImpl {
 
 	public ResponseEntity<?> create(ProjectEmployeMappingDto projectEmployeMappingDto) {
 		ProjectEmployeMappingEntity projectEmployeMappingEntity = null;
-		responceMap = new HashMap<String, Object>();
-		headers = Utilities.getDefaultHeader();
+		try {
+			for (EmployeeDetailForProjDto employeeDetailForProjDto : projectEmployeMappingDto.getEmployeeList()) {
+				if (projectEmployeMappingDto.getProjectId() != null && employeeDetailForProjDto.getAccountId() != null
+						&& employeeDetailForProjDto.getRateCardId() != null) {
+					int count = projectEmployeMappingRepository.countOnProjectIdAndAccountId(
+							projectEmployeMappingDto.getProjectId(), employeeDetailForProjDto.getAccountId());
+					if(count>0) {
+						responceMap = new HashMap<String, Object>();
+						headers = Utilities.getDefaultHeader();
+
+						headers.add(Constants.STATUS, HttpStatus.CONFLICT.toString());
+						headers.add(Constants.MESSAGE, "Employee mapping failed due to conflict");
+						responceMap.put("Status", HttpStatus.CONFLICT);
+						return new ResponseEntity<>(responceMap, headers, HttpStatus.CONFLICT);
+					}
+				} else {
+					responceMap = new HashMap<String, Object>();
+					headers = Utilities.getDefaultHeader();
+					headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+					headers.add(Constants.MESSAGE, "Employee mapping failed due to null value");
+					responceMap.put("Status", HttpStatus.NO_CONTENT);
+					responceMap.put("MESSAGE", "Employee mapping failed due to null value");
+
+					return new ResponseEntity<>(responceMap, headers, HttpStatus.NO_CONTENT);
+				}
+			}
+		} catch (Exception exception) {
+			logger.error("ProjectEmployee Mapping:Create:" + exception.getMessage());
+		}
+
 		try {
 			for (EmployeeDetailForProjDto employeeDetailForProjDto : projectEmployeMappingDto.getEmployeeList()) {
 				projectEmployeMappingEntity = new ProjectEmployeMappingEntity();
-				// projectEmployeMappingDto.setAccountId(employeeDetailForProjDto.getAccountId());
-				/*
-				 * projectEmployeMappingEntity =
-				 * GenericMapper.mapper.map(projectEmployeMappingDto,
-				 * ProjectEmployeMappingEntity.class);
-				 */
 				projectEmployeMappingEntity.setAccountId(employeeDetailForProjDto.getAccountId());
 				projectEmployeMappingEntity.setActive(projectEmployeMappingDto.getActive());
 				projectEmployeMappingEntity.setId(projectEmployeMappingDto.getId());
@@ -116,15 +138,21 @@ public class ProjectEmployeMappingImpl {
 			}
 
 			if (projectEmployeMappingEntity.getId() != null) {
+				responceMap = new HashMap<String, Object>();
+				headers = Utilities.getDefaultHeader();
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, "Expens Detail created successfully");
 				responceMap.put("Status", HttpStatus.OK);
 			} else {
+				responceMap = new HashMap<String, Object>();
+				headers = Utilities.getDefaultHeader();
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
 			}
 		} catch (Exception e) {
+			responceMap = new HashMap<String, Object>();
+			headers = Utilities.getDefaultHeader();
 			// TODO Auto-generated catch block
 			logger.error("ExpenceServiceImpl::create::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
