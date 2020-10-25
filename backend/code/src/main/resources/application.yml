@@ -10,12 +10,12 @@ spring:
   application:
     name: booster
   datasource:
-#    url: jdbc:mysql://172.104.34.172:3306/projectmanagment?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&useSSL=false
-#    username: root
-#    password: root
-    url: jdbc:mysql://localhost:3306/projectmanagment1?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&useSSL=false
-    username: vishva
-    password: admin@123
+    url: jdbc:mysql://172.104.34.172:3306/projectmanagment?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&useSSL=false
+    username: root
+    password: root
+    # url: jdbc:mysql://localhost:3306/projectmanagment1?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&characterSetResults=UTF-8&autoReconnect=true&useSSL=false
+    # username: vishva
+    # password: admin@123
     driver-class-name: com.mysql.cj.jdbc.Driver
     tomcat:
       test-while-idle: true

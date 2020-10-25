@@ -2,3 +2,7 @@
 /forntend/code/node_modules
 /forntend/code/build
 /forntend/code/package-lock.json
+
+/backend/vscode
+/backend/code/build
+/backend/code/.gradle

@@ -1,18 +1,19 @@
 version: '3.0'
 
 services:
-  # prms-backend: 
-  #   container_name: prms-backend
-  #   image: prms-backend-image
-  #   build: 
-  #     context: ./backend
-  #     dockerfile: Dockerfile
-  #   volumes:
-  #     - ./backend/src:/home/gradle/src
-  #   ports:
-  #     - 8007:8080 
-  #   networks:
-  #     - prmsnet 
+  prms-backend: 
+    container_name: prms-backend
+    image: prms-backend-image
+    build: 
+      context: ./backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./backend/code:/home/gradle/src
+      - ./backend/vscode:/root/.vscode-server
+    ports:
+      - 9002:9002 
+    networks:
+      - prmsnet 
   prms-forntend: 
     container_name: prms-forntend
     image: prms-forntend-image
