@@ -1,5 +1,6 @@
 # pull official base image
 FROM node:13.12.0-alpine as build
+USER root
 # set working directory
 WORKDIR /app
 RUN apk add build-base \
