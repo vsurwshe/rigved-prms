@@ -25,9 +25,10 @@ services:
       - prms-backend
     volumes:
       - ./forntend/vscode:/root/.vscode-server
-      - ./forntend/code:/app
+      - ./forntend/code:/usr/src/app
     ports:
-      - 4041:5000
+      - 4001:5000
+      - 4042:4001
     networks:
       - prmsnet 
 networks: 

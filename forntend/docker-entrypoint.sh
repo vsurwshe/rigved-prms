@@ -6,7 +6,7 @@ command -v git >/dev/null 2>&1 ||
 { echo >&2 "Git is not installed. Installing..";
   yum install git -y
 }
-echo "In PRMS GIT Version";
+echo "In PRMS-Forntend GIT Version";
 git --version 
 # #this loop will used for the continue running container
 # while true; do
