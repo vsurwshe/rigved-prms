@@ -12,9 +12,9 @@ const RegsiterTable=(props)=>{
 
     // creating columns
     const columns = [
-        { title: 'Sr.\u00a0No.', field: 'key', width: 1 },
+        { title: 'Sr.\u00a0No.', field: 'key', width: 5 },
         { title: 'Name', field: 'name' },
-        { title: 'Code', field: 'employeeNumber' },
+        { title: 'Code', field: 'employeeNumber',width: 10 },
         { title: 'Email', field: 'emailId' },
         { title: 'Designation', field: 'designation' },
         { title: 'Mobile\u00a0Number', field: 'mobileNumber', width: 10 },

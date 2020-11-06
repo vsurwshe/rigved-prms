@@ -7,7 +7,8 @@ import {
   ArrowBack as ArrowBackIcon,
   SupervisedUserCircle as UserIcon,
   Assignment as ProjectIcon,
-  FileCopy as InvoiceIcon
+  FileCopy as InvoiceIcon,
+  Home as DashIcon
 } from "@material-ui/icons";
 import ShoppingCartIcon from '@material-ui/icons/ShoppingCart';
 import { useTheme } from "@material-ui/styles";
@@ -28,16 +29,17 @@ import {
 } from "../../context/LayoutContext";
 
 const structure = [
-  { id: 0, label: "Register", link: "/register", icon: <RegisterIcon /> },
-  { id: 1, label: "Client", link: "/client", icon: <UserIcon /> },
-  { id: 2, label: "Purchase Order", link: "/purchaseOrder", icon: <ShoppingCartIcon />},
-  { id: 3, label: "Project", link: "/project", icon: <ProjectIcon />},
-  { id: 4, label: "Invoice", link: "/invoice", icon: <InvoiceIcon />},
-  { id: 5, type: "divider" },
-  { id: 6, type: "title", label: "HELP" },
-  { id: 7, label: "Support", link: "", icon: <SupportIcon /> },
-  { id: 8, label: "FAQ", link: "", icon: <FAQIcon /> },
-  { id: 9, type: "divider" },
+  { id: 0, label: "Dashboard", link: "/", icon: <DashIcon /> },
+  { id: 1, label: "Register", link: "/register", icon: <RegisterIcon /> },
+  { id: 2, label: "Client", link: "/client", icon: <UserIcon /> },
+  { id: 3, label: "Purchase Order", link: "/purchaseOrder", icon: <ShoppingCartIcon />},
+  { id: 4, label: "Project", link: "/project", icon: <ProjectIcon />},
+  { id: 5, label: "Invoice", link: "/invoice", icon: <InvoiceIcon />},
+  { id: 6, type: "divider" },
+  { id: 7, type: "title", label: "HELP" },
+  { id: 8, label: "Support", link: "", icon: <SupportIcon /> },
+  { id: 9, label: "FAQ", link: "", icon: <FAQIcon /> },
+  { id: 10, type: "divider" },
 ];
 
 function Sidebar({ location }) {

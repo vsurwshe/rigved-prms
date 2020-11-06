@@ -1,7 +1,7 @@
 import React from 'react';
-import { Button, Grid, Accordion, AccordionSummary, AccordionDetails, CircularProgress } from "@material-ui/core";
+import { Button, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
 import { Field, reduxForm, reset } from 'redux-form';
-import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput, renderPasswordTextField } from '../utilites/FromUtilites';
+import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput, renderPasswordTextField, renderLoading } from '../utilites/FromUtilites';
 import useStyles from "./styles";
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
@@ -58,7 +58,7 @@ const PersonalInfo = (props) => {
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> PERSONAL INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                {(profileImageUrl === "" || profileImageUrl === undefined) ? (profileImageUpload ? loadingCircle()
+                {(profileImageUrl === "" || profileImageUrl === undefined) ? (profileImageUpload ? renderLoading({message:"Uploading..", size:40})
                     : <Field name="profilePic" component={renderFileInput} fullWidth successFunction={profileImageUploadMethod} type="file" lable="Profile Image" />)
                     : <h5>{loadFileUrlName(profileImageUrl)}</h5>}
                 <Field name="designation" component={renderTextField} label="Job Title" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />
@@ -76,9 +76,6 @@ const loadFileUrlName = (fileUrl) => {
     let fileArray = fileUrl.split("\\");
     return fileArray.length > 0 ? fileArray[5] : "";
 }
-
-// this method will used for the showing progress bar
-const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 const Skills = (props) => {
     const { SkillSet } = props

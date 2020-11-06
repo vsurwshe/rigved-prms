@@ -2,18 +2,19 @@ import React, { useState, forwardRef } from 'react';
 import { reduxForm, change, Field, formValueSelector } from 'redux-form';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton, CircularProgress } from '@material-ui/core';
+import { Button, Grid, TextField, Dialog, DialogTitle, DialogContent, DialogActions, Slide, AppBar, Toolbar, IconButton } from '@material-ui/core';
 import useStyles from "../client/Styles";
 import { Alert, Autocomplete } from '@material-ui/lab';
-import { renderDateTimePicker, renderAutocompleteWithProps } from '../utilites/FromUtilites';
+import { renderDateTimePicker, renderAutocompleteWithProps, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
+import { GetBillingData } from "../../redux/actions/DashboardAction"
 import * as ClientAction from "../../redux/actions/ClientAction";
 import * as ProjectAction from "../../redux/actions/ProjectAction"
 import * as InvoiceAction from "../../redux/actions/InvoiceAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import Invoice from './Invoice';
 import CloseIcon from '@material-ui/icons/Close';
-import jsPDF from 'jspdf';
+import * as jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import MaterialTable from 'material-table';
 import moment from 'moment';
@@ -25,7 +26,7 @@ const Transition = forwardRef(function Transition(props, ref) { return <Slide di
 
 let InvoiceFrom = (props) => {
     var classes = useStyles();
-    const { pristine, reset, submitting, handleSubmit } = props
+    const { pristine, reset, submitting, handleSubmit, cancle, viewInvoiceByID } = props
     const { SaveInvoiceEmployeeData } = props.InvoiceAction
     const [viewInvoice, setViewInvoice] = useState(false);
     const [projectIdList, setProjectIdList] = useState([])
@@ -35,13 +36,13 @@ let InvoiceFrom = (props) => {
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit((values) => PostInvoiceData({ "mainProps": props, values, projectIdList, viewSectionThree, setSubmit, setViewSectionThree, setLoading }))}>
             {LoadGird({ "mainProps": props, projectIdList, setProjectIdList, viewSectionThree, setViewSectionThree, loading, setLoading, setViewInvoice })}
+            {viewInvoiceByID && setViewInvoice(viewInvoiceByID)}
             {ShowViewInvoice({ "mainProps": props, classes, viewInvoice, setViewInvoice })}
             <div className={classes.buttonStyle}>
                 <center>
                     <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting || submit}>SUBMIT</Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={async () => { await reset(); await SaveInvoiceEmployeeData([]); await setViewSectionThree(false); }}> Clear Values</Button>&nbsp;&nbsp;
-                    {/* <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp; */}
-                    {/* <Button type="button" variant="outlined" color="primary" onClick={() => setViewInvoice(true)}>View Invoice</Button> */}
+                    <Button type="button" variant="outlined" color="secondary" onClick={async () => { await reset(); cancle() }}> Cancel</Button> &nbsp;&nbsp;
                 </center>
             </div>
         </form>
@@ -120,45 +121,35 @@ const LoadGird = (props) => {
         </Grid>
         <Grid container spacing={5}>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }}>
-                {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList })}
+                {SectionOne({ classes, "mainProps": props.mainProps, projectIdList, setProjectIdList, setLoading })}
             </Grid>
             <Grid item xs={12} sm={6} style={{ paddingLeft: 30, paddingTop: 30 }} >
                 {SectionTwo({ classes, "mainProps": props.mainProps })}
             </Grid>
         </Grid>
-        <center>{loading && LoadingCircle("Saving")}</center>
+        <center>{loading && renderLoading({message:"", size:40})}</center>
         <Grid container spacing={5} style={{ paddingLeft: 10, paddingTop: 20 }}>
             <Grid item xs={12}>
                 {viewSectionThree && SectionThree({ "mainProps": props.mainProps , viewSectionThree, setViewSectionThree, projectIdList, setLoading, setViewInvoice})}
             </Grid>
         </Grid>
-
     </>
 }
-
-// this method will used for the loading bar
-const LoadingCircle = (message) => <center> {message} <CircularProgress size={40} /> </center>
 
 // this method will used for the load the left side part 
 const SectionOne = (data) => {
     const { setProjectIdList } = data
+    const { setLoading }= data
     const { listOfClient } = data.mainProps.ClientState
     const { authorization } = data.mainProps.LoginState
     const { projectListByClient } = data.mainProps.ProjectState
     // const { purchaseOrderListByName } = data.mainProps.PurchaseOrderState
-    const { GetClientList } = data.mainProps.ClientAction
     const { GetProjectListByClient } = data.mainProps.ProjectAction
     // const { GetPurchaseOrderListByName,SavePurchaseOrderListByName }=data.mainProps.PurchaseOrderAction
-    const [clientCall, setClientCall] = useState(0);
 
     // let purchaseOrderOptions = purchaseOrderListByName.length > 0 && purchaseOrderListByName.map((item, key) => {
     //     return { title: item.poNum ? item.poNum : "", id: item.id }
     // })
-
-    if (listOfClient.length <= 0 && clientCall === 0) {
-        GetClientList(0, 20, authorization);
-        setClientCall(clientCall + 1);
-    }
 
     // this is returning client option 
     let clientOptions = (listOfClient && listOfClient.length > 0) && listOfClient.map((item, key) => {
@@ -172,13 +163,17 @@ const SectionOne = (data) => {
 
     return <>
         <Field name="clientName" component={renderAutocompleteWithProps}
-            onChange={(value) => {
-                change('ProjectForm', 'clientName', value.title);
+            onChange={async(value) => {
+                await setLoading(true)
+                await change('ProjectForm', 'clientName', value.title);
                 // SavePurchaseOrderListByName([]);
-                GetProjectListByClient(0, 20, value.id, authorization)
+                await GetProjectListByClient(0, 20, value.id, authorization)
                 // GetPurchaseOrderListByName(0, 20, value.id, authorization)
+                await setLoading(false);
             }}
-            optionData={clientOptions} label="Client Name" validate={[Required]} />
+            optionData={clientOptions} label="Client Name" validate={[Required]} 
+            style={{marginTop:-15}}
+        />
         {/* <Field name="poNum" component={renderAutocompleteWithProps}
             onChange={(value) => {
                 change('ProjectForm', 'poNum', value.title);
@@ -306,6 +301,7 @@ const GenratePDFInvoice=async (propsData)=>{
     await GenerateInvoicePDF(newInvoiceGenratePDFData, authorization);
     setTimeout(async () => {
         await loadMessage();
+        await GetBillingData(authorization,{});
         await setLoading(false);
         (genratedInvoiceData && genratedInvoiceData.length >0) && await setViewInvoice(true);
     }, API_EXE_TIME)

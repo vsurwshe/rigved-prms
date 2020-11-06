@@ -1,6 +1,4 @@
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
-import { AlertColor } from '../../assets/config/Config';
-import { ProjectResourceError } from '../../assets/config/ErrorStringFile';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 

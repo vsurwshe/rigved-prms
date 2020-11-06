@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Grid, Button, FormLabel, CircularProgress } from '@material-ui/core';
+import { Grid, Button, FormLabel } from '@material-ui/core';
 import { reset, reduxForm, Field, FieldArray, formValueSelector, getFormSyncErrors } from 'redux-form';
 import SimpleTabs from './TabPanleUtilites';
-import { renderTextField, renderContact, renderTextHiddenField, renderFileInput, renderTextAreaField } from '../utilites/FromUtilites';
+import { renderTextField, renderContact, renderTextHiddenField, renderFileInput, renderTextAreaField, renderLoading } from '../utilites/FromUtilites';
 import useStyles from "../client/Styles";
 import { connect } from 'react-redux';
 import RateCardTable from '../rateCard/RateCardTable';
@@ -151,13 +151,13 @@ const Financials = (data) => {
             </Grid>
             <Grid item xs={12} sm={4}>
                 <Grid item xs={12}>
-                    {((gstFileUrl === "" || gstFileUrl === undefined) && initialValues === undefined) ? (gstUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
+                    {((gstFileUrl === "" || gstFileUrl === undefined) && initialValues === undefined) ? (gstUpload ? renderLoading({message:"Uploading..", size:70}): <Field name="gstUrl" component={renderFileInput} type="file" successFunction={gstFileUpload} validate={[Required]} lable="GST Card Image" />)
                         : <>{initialValues === undefined ?(<h5>GST File: {LoadFileUrlName(gstFileUrl)}</h5>)
                             : LoadFileUrl({ "url": initialValues.gstUrl, "cid": initialValues.id, "props": data, "componentName": "GST Image" })} </>
                     }
                 </Grid>
                 <Grid item xs={12}>
-                    {((tanFileUrl === "" || tanFileUrl === undefined) && initialValues === undefined) ? (tanUpload ? loadingCircle() : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
+                    {((tanFileUrl === "" || tanFileUrl === undefined) && initialValues === undefined) ? (tanUpload ? renderLoading({message:"Uploading..", size:70}) : <Field name="gstUrl" component={renderFileInput} type="file" successFunction={tanFileUpload} validate={[Required]} lable="TAN Card Image" />)
                         : <>{initialValues === undefined ? (<h5>TAN File: {LoadFileUrlName(tanFileUrl)}</h5>)
                             : LoadFileUrl({ "url": initialValues.tanUrl, "cid": initialValues.id, "props": data, "componentName": "TAN Image" })} </>
                     }
@@ -185,9 +185,6 @@ const GetPhotos = async (parameter) => {
     const { authorization } = parameter.props.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid);
 }
-
-// this method will used for the showing progress bar
-const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 // this will be load the bank details related fields
 const BankDetailsDto = () => {

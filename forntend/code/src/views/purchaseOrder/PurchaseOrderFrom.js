@@ -1,9 +1,9 @@
 import React from 'react';
 import { reset, reduxForm, Field, change } from 'redux-form';
 import { connect } from 'react-redux';
-import { Button, Grid, CircularProgress } from '@material-ui/core';
+import { Button, Grid } from '@material-ui/core';
 import useStyles from "../client/Styles";
-import { renderTextField, renderDateTimePicker, renderFileInput, renderTextHiddenField, renderAutocompleteWithProps } from '../utilites/FromUtilites';
+import { renderTextField, renderDateTimePicker, renderFileInput, renderTextHiddenField, renderAutocompleteWithProps, renderLoading } from '../utilites/FromUtilites';
 import { Required } from '../utilites/FormValidation';
 import { FromActions } from '../../assets/config/Config';
 import * as FileAction from "../../redux/actions/FileAction";
@@ -60,7 +60,7 @@ const SectionOne = (data) => {
     return <>
         {operation === FromActions.CR ? LoadFields({ classes,"mainProps":data.props }) : LoadHeader({ classes, initialValues })}
         {operation === FromActions.CR &&
-            <>{(purchaseOrderFileUpload) ? loadingCircle()
+            <>{(purchaseOrderFileUpload) ? renderLoading({message:"Uploading...", size:40})
                 : (purchaseOrderFileUrl ? LoadFileUrl({ "url": purchaseOrderFileUrl, "cid": 1, "mainProps": data.props, "componentName": "Purchase Order Image", "style": { height: "50%", width: "70%" } })
                     : <Field name="poCntrUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Purchase Order File" />)
             }</>}
@@ -81,9 +81,6 @@ const GetPhotos = async (parameter) => {
     const { authorization } = parameter.mainProps.LoginState
     return await FetchPhoto(parameter.url, authorization, parameter.cid,"application/pdf");
 }
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Uploading <CircularProgress size={40} /> </center>
 
 // this method used for the load the fileds value for name and purchase order number
 const LoadFields = (parameter) => {

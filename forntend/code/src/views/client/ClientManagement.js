@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Card, Button, CircularProgress, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core'
+import { Card, Button, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core'
 import ClientTable from './ClientTable';
 import { connect } from 'react-redux';
 import ClientForm from './ClientForm';
@@ -8,6 +8,7 @@ import * as ClientAction from "../../redux/actions/ClientAction";
 import * as MasterDataAction from "../../redux/actions/MasterDataAction";
 import * as FileAction from "../../redux/actions/FileAction"
 import { API_EXE_TIME } from '../../assets/config/Config';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class ClientManagment extends Component {
     state = {
@@ -135,7 +136,7 @@ class ClientManagment extends Component {
     // this method main framework which calling load client table method
     loadClientTable = () => {
         const { loadClientList } = this.state
-        return < div style={{ paddingRight: 10 }}> {loadClientList ? this.loadingCircle() : this.loadingClientTable()} </div>
+        return < div style={{ paddingRight: 10 }}> {loadClientList ? renderLoading({ message:"Loading Client Management", size:80}): this.loadingClientTable()} </div>
     }
 
     // this method used for load the client table
@@ -145,8 +146,6 @@ class ClientManagment extends Component {
             <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
         </>
     }
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Client Managment</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
     viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }

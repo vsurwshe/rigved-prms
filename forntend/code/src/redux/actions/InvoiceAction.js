@@ -7,7 +7,7 @@ import { InvoiceError } from '../../assets/config/ErrorStringFile';
 const GetInvoiceList = (firstIndex, lastIndex, authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
-            .get('/invoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
+            .get('/innvoice/invoiceList/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
             .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceList, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
@@ -32,6 +32,18 @@ const GenerateInvoice = (invoiceData, authroizationKey) => {
                         return SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) 
                 }
             })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
+const GetPDFInvoiceData = (invoiceId, authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/innvoice/create/'+invoiceId,{headers: { 
+                'Content-Type': 'application/json',
+                Authorization: authroizationKey 
+            }})
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveInvoiceEmployeeData, "loadMessage":loadMessage, response}) })
             .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
@@ -75,6 +87,13 @@ export function SaveInvoiceEmployeeData(invoiceData) {
     }
 }
 
+export function SavePDFInvoiceData(invoiceData) {
+    return {
+        type: "SAVE_PDF_INVOICE_DATA",
+        invoiceData
+    }
+}
+
 export function SaveGenratedInvoiceData(invoiceData) {
     return {
         type: "SAVE_INVOICE_CREATE_PDF",
@@ -85,5 +104,6 @@ export function SaveGenratedInvoiceData(invoiceData) {
 export{
     GetInvoiceList,
     GenerateInvoice,
-    GenerateInvoicePDF
+    GenerateInvoicePDF,
+    GetPDFInvoiceData
 }

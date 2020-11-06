@@ -10,7 +10,7 @@ const SuccessFunction=(props)=>{
         response.headers.message && postMethod && dispatch(loadMessage(AlertColor.success , response.headers.message));
         id ? dispatch(successMethod(response.data,id)) : dispatch(successMethod(response.data))
         postMethod && dispatch(loadMessage("" , ""));
-        dispatch(loadMessage(AlertColor.success , message));
+        message && dispatch(loadMessage(AlertColor.success , message));
     }
 }
 

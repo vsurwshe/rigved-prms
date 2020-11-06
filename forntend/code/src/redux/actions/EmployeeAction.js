@@ -1,6 +1,4 @@
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
-import { AlertColor } from '../../assets/config/Config';
-import { ProjectResourceError } from '../../assets/config/ErrorStringFile';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
@@ -21,18 +19,7 @@ const SaveEmployeeRecord=(userData,authroizationKey)=>{
             Authorization: authroizationKey 
         }})
         .then(response => { SuccessFunction({ dispatch , "successMethod": SaveEmployeeDetails, "loadMessage":loadMessage, response}) })
-        .catch(error => { 
-            if(error && error.response){
-                switch (error && error.response && error.response.status) {
-                    case 409:
-                        return dispatch(loadMessage(AlertColor.danger, ProjectResourceError.CONFLICT)); 
-                    default:
-                        return ErrorFunction({dispatch,"loadMessage":loadMessage, error}) 
-                }
-            }else{
-                return ErrorFunction({dispatch,"loadMessage":loadMessage, error}) 
-            }
-        })
+        .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
     }
 }
 

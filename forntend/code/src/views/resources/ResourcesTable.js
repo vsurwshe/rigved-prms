@@ -1,5 +1,5 @@
 import React, { useState, forwardRef } from 'react';
-import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, CircularProgress, RadioGroup } from '@material-ui/core';
+import { Dialog, Button, Slide, DialogTitle, DialogActions, makeStyles, DialogContent, Grid, RadioGroup } from '@material-ui/core';
 import { connect } from 'react-redux';
 import MaterialTable from 'material-table';
 import AppBar from '@material-ui/core/AppBar';
@@ -8,15 +8,17 @@ import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 import * as EmployeeAction from "../../redux/actions/EmployeeAction";
 import * as ClientAction from "../../redux/actions/ClientAction"
+import { loadMessage } from "../../redux/actions/ClientAction";
+import { GetResourceData } from "../../redux/actions/DashboardAction";
 import Autocomplete from '@material-ui/lab/Autocomplete';
 import TextField from '@material-ui/core/TextField';
 import { FromActions, API_EXE_TIME } from '../../assets/config/Config';
 import { bindActionCreators } from 'redux';
 import ResourceRateCardTable from "./ResourceRateCardTable";
-import { loadMessage } from "../../redux/actions/ClientAction";
 import moment from 'moment';
 import CreateIcon from '@material-ui/icons/Create';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
+import { renderLoading } from '../utilites/FromUtilites';
 
 
 const useStyles = makeStyles((theme) => ({
@@ -123,8 +125,7 @@ let ResourcesTable = (props) => {
   });
 
 
-  return <> 
-  {LoadAddResourceModel({ open, handleClose, "mainProps": props })}
+  return <> {LoadAddResourceModel({ open, handleClose, "mainProps": props })}
     <div style={{ maxWidth: "100%" }}>
       <MaterialTable
         title=""
@@ -166,9 +167,10 @@ let ResourcesTable = (props) => {
                     "onbordaingDate": newData && newData.onbordaingDate,
                     "exitDate": newData && newData.exitDate
                   }
-                  await EditEmployeeRecord(resourceData, authorization);
-                  setTimeout(async () => {
-                    await GetEmployeeListByProjectId(0, 20, newData.projectId, authorization);
+                  await EditEmployeeRecord(resourceData,authorization);
+                  setTimeout(async()=>{
+                    await GetResourceData(authorization,{});
+                    await GetEmployeeListByProjectId(0,20,newData.projectId,authorization);
                     resolve();
                   }, API_EXE_TIME)
                 } else {
@@ -183,11 +185,12 @@ let ResourcesTable = (props) => {
           onRowDelete: oldData => {
             return new Promise(async (resolve, reject) => {
               (oldData && oldData.emploeeMappedId) && await DeleteEmployeeRecord(oldData.emploeeMappedId, authorization);
-              setTimeout(async () => {
-                await GetEmployeeListByProjectId(0, 20, projectId, authorization)
-                resolve();
-              }, API_EXE_TIME)
-            })
+               setTimeout(async()=>{
+                  await GetResourceData(authorization,{});
+                  await GetEmployeeListByProjectId(0,20,projectId, authorization)
+                  resolve();
+               },API_EXE_TIME)
+             })
           }
         }}
       />
@@ -201,9 +204,8 @@ const LoadAddResourceModel = (data) => {
   const { open, handleClose } = data
   const [listOfEmployeeAccount, setEmployeeAccount] = useState([]);
   const [selectedRateCard, setSelectedRateCard] = useState({});
-  const [tableData, setTableData] = useState([]);
+  const [tableData, setTableData] = useState({});
   const [load, setLoad] = useState(false);
-  const { common_message }= data.mainProps.ClientState
   return <Dialog fullScreen open={open} onClose={handleClose} TransitionComponent={Transition}>
     <AppBar className={classes.appBar} style={{ float: "right" }}>
       <Toolbar >
@@ -212,31 +214,27 @@ const LoadAddResourceModel = (data) => {
       </Toolbar>
     </AppBar>
     <DialogContent>
-      {common_message && alert(common_message)}
-      {load ? loadingCircle() : <>
-        <Grid container spacing={3}>
-          <Grid item xs={7}>
-            {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
-          </Grid>
-          <Grid item xs={5}>
-            {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": data.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
-          </Grid>
+      {load ? renderLoading({message:"", size:50}) : <><Grid container spacing={3}>
+        <Grid item xs={7}>
+          {LoadRateCardList({ "mainProps": data.mainProps, selectedRateCard, setSelectedRateCard })}
         </Grid>
-      </>
+        <Grid item xs={5}>
+          {(selectedRateCard && selectedRateCard.domainName) && LoadEmployeeList({ "mainProps": data.mainProps, listOfEmployeeAccount, setEmployeeAccount, tableData, setTableData, selectedRateCard })}
+        </Grid>
+      </Grid></>
       }
     </DialogContent>
     <DialogActions>
-      <Button onClick={() => { handleClose(); setSelectedRateCard({}); setTableData([]) }} color="primary">Cancel</Button>
-      <Button onClick={() => loadAssignResource({ listOfEmployeeAccount, selectedRateCard, "mainProps": data.mainProps, load, setLoad, handleClose, tableData, setTableData, setSelectedRateCard })} color="secondary">Assign Resource</Button>
+      <Button onClick={() => { handleClose(); setSelectedRateCard({}); setTableData({}) }} color="primary">Cancel</Button>
+      <Button onClick={() => loadAssignResource({ listOfEmployeeAccount, selectedRateCard, "mainProps": data.mainProps, load, setLoad, handleClose, tableData, setTableData })} color="secondary">Assign Resource</Button>
     </DialogActions>
   </Dialog>
 }
 
 // this method will used for the loading assign resource
 const loadAssignResource = (data) => {
-  console.log("LR ",data.mainProps)
-  const { setLoad, load, handleClose, tableData, setTableData, setSelectedRateCard } = data
-  const { projectId, dispatch } = data.mainProps
+  const { setLoad, load, handleClose, tableData, setTableData } = data
+  const { projectId } = data.mainProps
   const { authorization } = data.mainProps.LoginState
   const { SaveEmployeeRecord, GetEmployeeListByProjectId } = data.mainProps.EmployeeAction
   let newResourceData = {
@@ -245,17 +243,17 @@ const loadAssignResource = (data) => {
     "active": 1
   }
   setLoad(true);
-  saveAssignResource({ newResourceData, load, setLoad, SaveEmployeeRecord, GetEmployeeListByProjectId, authorization, handleClose, setTableData, setSelectedRateCard, dispatch });
+  saveAssignResource({ newResourceData, load, setLoad, SaveEmployeeRecord, GetEmployeeListByProjectId, authorization, handleClose, setTableData });
 }
 
 // this method will used for calling the save employee record
 const saveAssignResource = async (propsData) => {
-  const { newResourceData, setLoad, SaveEmployeeRecord, GetEmployeeListByProjectId, authorization, handleClose, setTableData, setSelectedRateCard, dispatch } = propsData
+  const { newResourceData, setLoad, SaveEmployeeRecord, GetEmployeeListByProjectId, authorization, handleClose, setTableData } = propsData
   if (newResourceData) {
     await SaveEmployeeRecord(newResourceData, authorization);
-    await dispatch(loadMessage());
-    await GetEmployeeListByProjectId(0, 20, newResourceData.projectId, authorization);
-    await setSelectedRateCard({});
+    await loadMessage();
+    await GetResourceData(authorization,{});
+    await GetEmployeeListByProjectId(0,20,newResourceData.projectId,authorization);
     await setTableData([]);
     await setLoad(false);
     await handleClose();
@@ -275,10 +273,6 @@ const renderTextField = (props) => {
     required={true}
   />
 }
-
-
-// this method will used for the loading circule progress bar
-const loadingCircle = () => <center> Saving.... <CircularProgress size={40} /> </center>
 
 // this method will used for the loading employee list
 const LoadEmployeeList = (props) => {
@@ -376,7 +370,6 @@ const LoadRateCardList = (propsData) => {
 
 const mapStateToProps = state => { return state; };
 const mapDispatchToProps = (dispatch) => ({
-  dispatch,
   EmployeeAction: bindActionCreators(EmployeeAction, dispatch),
   ClientAction: bindActionCreators(ClientAction, dispatch)
 })

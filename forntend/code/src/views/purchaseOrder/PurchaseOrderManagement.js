@@ -5,11 +5,12 @@ import * as FileAction from '../../redux/actions/FileAction'
 import * as ClientAction from "../../redux/actions/ClientAction"
 import { loadMessage } from '../../redux/actions/ClientAction'
 import { bindActionCreators } from 'redux';
-import { Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, CircularProgress, DialogActions } from '@material-ui/core';
+import { Card, Dialog, DialogTitle, DialogContent, DialogContentText, Button, DialogActions } from '@material-ui/core';
 import PurchaseOrderTable from './PurchaseOrderTable';
 import PurchaseOrderForm from './PurchaseOrderFrom'
 import { API_EXE_TIME, FromActions } from '../../assets/config/Config';
 import moment from 'moment';
+import { renderLoading } from '../utilites/FromUtilites';
 
 class PurchaseOrderManagement extends Component {
     state = {
@@ -126,7 +127,7 @@ class PurchaseOrderManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadPurchaseOrder = () => {
         const { loadPuchaseOrderList } = this.state
-        return <div>  {loadPuchaseOrderList ? this.loadingCircle() : this.loadingPurchaseOrderTable()} </div>
+        return <div>  {loadPuchaseOrderList ? renderLoading({ message:"Loading Purchase Order Management", size:80 }) : this.loadingPurchaseOrderTable()} </div>
     }
 
     // this method used for load the client table
@@ -136,8 +137,6 @@ class PurchaseOrderManagement extends Component {
             <PurchaseOrderTable operation={operation} createPurchaseOrder={this.handleCreatePurchaseOrder} viewPurchaseOrder={this.viewPuchaseOrderDetails} deletePuchaseOrder={this.handleDeleteModel} />
         </>
     }
-    // this method used for the show circular progress bar 
-    loadingCircle = () => <center> <h3>Purchase Order Management</h3> <CircularProgress size={80} /> </center>
 
     // this method called when we click the view button in client table
     viewPuchaseOrderDetails = (data, operation) => { this.handleCreatePurchaseOrder(data, operation) }

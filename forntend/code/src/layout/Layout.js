@@ -6,17 +6,17 @@ import Header from '../views/Header/Header'
 // styles
 import useStyles from "./styles";
 import { useLayoutState } from "../context/LayoutContext";
-import { Dashboard } from '@material-ui/icons';
 import UserManagement from '../views/register/UserManagement';
 import ClientManagment from '../views/client/ClientManagement';
 import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 import ProjectManagement from '../views/project/ProjectManagement';
 import PurchaseOrderFrom from '../views/purchaseOrder/PurchaseOrderFrom';
 import InvoiceManagement from '../views/invoice/InvoiceManagement'
-
+import Dashboard from '../views/dashboard/Dashboard';
+ 
 const RoutesPath=[
+    {path:"/",component: Dashboard, exact: true},
     {path:"/register",component: UserManagement},
-    {path:"/app/dashborad",component: Dashboard},
     {path:"/client",component: ClientManagment},
     {path:"/purchaseOrder",component: PurchaseOrderManagement},
     {path:"/project",component: ProjectManagement},

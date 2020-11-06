@@ -3,6 +3,7 @@ import thunk from "redux-thunk";
 import logger from 'redux-logger';
 import { reducer as reduxFormReducer } from 'redux-form';
 import LoginState from "./reducer/LoginState";
+import DashboardState from "./reducer/DashboardState";
 import ClientState from "./reducer/ClientState";
 import FileState from "./reducer/FileState";
 import MasterDataSet from "./reducer/MasterDataState";
@@ -46,6 +47,7 @@ const persistedState= loadFormLocalStorgae();
 const reducer = combineReducers({
   form: reduxFormReducer, // mounted under "form"
   LoginState,
+  DashboardState,
   ClientState,
   FileState,
   ProjectState,
@@ -60,7 +62,7 @@ const reducer = combineReducers({
 const enhancer= compose(applyMiddleware(thunk, logger));
 
 // this is common action through out application will be used
-const initialState = reducer({},{},{},{},{},{},{},{})
+const initialState = reducer({},{},{},{},{},{},{},{},{})
 const rootReducer = (state, action) => {
   if (action.type === 'CLEAR_DATA') {
     state = initialState

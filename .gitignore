@@ -1,6 +1,7 @@
 /forntend/vscode
 /forntend/code/node_modules
 /forntend/code/build
+/forntend/code/.vscode
 /forntend/code/package-lock.json
 
 /backend/vscode
