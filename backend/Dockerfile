@@ -1,7 +1,9 @@
 FROM gradle:jdk10
 USER root
+# Create app directory
 WORKDIR /home/gradle/src
+# Copy shell file
 COPY --chown=gradle:gradle docker-entrypoint.sh  /entrypoint.sh
+# make executeable file
 RUN chmod a+x /entrypoint.sh
-# COPY --chown=gradle:gradle ./code /home/gradle/src
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh","developer0688","Vishvanath1"]

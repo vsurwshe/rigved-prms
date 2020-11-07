@@ -1,14 +1,9 @@
 FROM node:12
 # Create app directory
 WORKDIR /usr/src/app
-# Install app dependencies
-# RUN npm install
-# If you are building your code for production
-# RUN npm ci --only=production
-# Bundle app source
-# COPY . .
+# Copy shell file
 COPY docker-entrypoint.sh /entrypoint.sh
+# make executeable file
 RUN chmod a+x /entrypoint.sh && chown root:root /entrypoint.sh
 EXPOSE 4001
-# CMD [ "npm", "start" ]
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/entrypoint.sh","developer0688","Vishvanath1"]
