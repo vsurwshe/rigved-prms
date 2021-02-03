@@ -17,13 +17,20 @@ public class InvoiceGenDto implements Serializable {
 	private static final long serialVersionUID = 1L;
 
 	private String id;
-	
+
 	private List<InvoiceDetailDto> invoiceDetailDtos;
+
+	private List<MileStoneDto> mileStoneDtos;
+	
+	private List<FixedRateInvoiceDetailDto> fixedRateInvoiceDetailDtos;
+	
+	private List<ClientBillingDto>  clientBillingDtos;
 	
 	private String projectId;
-	
+
 	private Date fromDate;
-	
+
 	private Date toDate;
-	
+
+	private String description;
 }

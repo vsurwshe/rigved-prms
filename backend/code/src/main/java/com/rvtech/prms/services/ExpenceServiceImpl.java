@@ -61,10 +61,14 @@ public class ExpenceServiceImpl {
 				headers.add(Constants.MESSAGE, "Expens Detail created successfully");
 				responceMap.put("Id", expenseEntity.getId());
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Expens Detail created successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+				responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -72,16 +76,19 @@ public class ExpenceServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 
 	}
 
-	public ResponseEntity<List<ExpenseDto>> expenseList(int pageIndex, int pageSize, String projectId) {
+	public ResponseEntity<?> expenseList(int pageIndex, int pageSize, String projectId) {
 		List<ExpenseDto> list = new ArrayList<ExpenseDto>();
 		List<ExpenseEntity> expEntitylist;
 		Pageable page = PageRequest.of(pageIndex, pageSize);
+		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		if (projectId == null || projectId.equals("")) {
 			expEntitylist = expenceRepository.findAllByActive(true, page);
@@ -96,9 +103,13 @@ public class ExpenceServiceImpl {
 					masterDataRepository.findByActiveAndId(true, expenseEntity.getExpTypeId()), MasterDataDto.class));
 			list.add(expenseDto);
 		}
-		if (list != null && list.isEmpty()) {
+		if (list == null && list.isEmpty()) {
 			headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
+			responceMap.put(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm");
+			return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
+
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Document Found Successfully For SearchTerm");
@@ -118,10 +129,13 @@ public class ExpenceServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Expend Successfully  deleted successfully");
 			responceMap.put("Status", HttpStatus.OK);
+			responceMap.put(Constants.MESSAGE, "Expend Successfully  deleted successfully");
+
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
 			responceMap.put("Status", HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm");
 
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);

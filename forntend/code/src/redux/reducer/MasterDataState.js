@@ -5,7 +5,8 @@ const initialState = {
     ManagerList: [],
     ExpenseTypeList: [],
     EmployeeList:[],
-    RoleList: []
+    RoleList: [],
+    projectBillingModelList:[]
 }
 
 // this is master data state 
@@ -25,6 +26,8 @@ const MasterDataState = (state = initialState, action) => {
             return { ...state, EmployeeList: action.EmployeeList}
         case "SAVE_ROLE_LIST":
             return { ...state, RoleList: action.RoleList}
+        case "SAVE_PROJECT_BILLING_LIST":
+            return { ...state, projectBillingModelList: action.projectBillingTypeList}
         default:
             return state
     }

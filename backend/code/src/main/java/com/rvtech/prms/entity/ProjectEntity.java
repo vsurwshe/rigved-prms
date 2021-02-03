@@ -53,7 +53,7 @@ public class ProjectEntity extends BaseEntity<String> {
 
 	@Column
 	private String purchaseOrder;
-	
+
 	@Column
 	private String purchaseOrderId;
 
@@ -65,9 +65,11 @@ public class ProjectEntity extends BaseEntity<String> {
 
 	@Column
 	private String clientName;
-	
+
 	@Column
 	private String clientId;
 
+	@Column
+	private String projectBillingType;
 
 }

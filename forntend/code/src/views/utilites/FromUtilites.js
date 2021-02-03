@@ -6,6 +6,12 @@ import { FromActions } from '../../assets/config/Config';
 import DeleteOutlineIcon from '@material-ui/icons/DeleteOutline';
 import { Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@material-ui/core';
 import { Field } from 'redux-form';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
+import { CheckBox } from '@material-ui/icons';
+import { Snackbar } from '@material-ui/core';
+import { Alert } from '@material-ui/lab';
+
 // this is render text filed
 const renderTextField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
     <TextField
@@ -63,7 +69,7 @@ const renderTextAreaField = ({ maxRows,name,label,helperText, input, meta: { tou
 )
 
 // this is render text filed
-const renderNumberField = ({ label, name,input,helperText, meta: { touched, invalid, error }, ...custom }) => (
+const renderNumberField = ({ label, name, input, helperText, meta: { touched, invalid, error }, ...custom }) => (
   <TextField
     id={name}
     type="number"
@@ -97,7 +103,6 @@ const handleChange = async(event, input, successFunction) => {
     await reader.readAsDataURL(imageFile);
   }
 };
-
 
 // this is render the checkbox 
 const renderCheckbox = ({ input, label }) => (
@@ -177,10 +182,10 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
   <Autocomplete
     id={name}
     key={name}
-    value={input.value}
     autoHighlight
     options={(optionData && optionData.length >0) ? optionData: []}
-    getOptionLabel={optionData => optionData.title ? optionData.title : optionData}
+    getOptionLabel={optionData => (optionData && optionData.title) && optionData.title}
+    getOptionSelected={(option, value) => option.id === value.id}
     onChange={(event, value) => value && input.onChange(value)}
     renderInput={(params) => ( <TextField {...params} label={label} margin="normal"  /> )}
     {...custom}
@@ -188,9 +193,6 @@ const renderAutocompleteWithProps=({label,name,optionData,className, input, meta
 
 // this will be render contact
 const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, initialValues, operation, meta: { error, submitFailed } }) => {
-  // const [open, setOpen] = useState(false);
-  // const handleClickOpen = () => { setOpen(true); fields.push({}) };
-  // const handleClose = () => { setOpen(false) };
   return <span>
       { (operation !== FromActions.VI )&&<Button style={{ float: "Right" }} variant="contained" color="primary" onClick={()=>handleClickOpen(fields)}>ADD</Button>}
       <Dialog open={open} onClose={handleClose} classes={{ paper: classes.dialogPaper }} aria-describedby="alert-dialog-description" aria-labelledby="responsive-dialog-title" >
@@ -216,9 +218,39 @@ const renderContact = ({ classes, open, handleClickOpen, handleClose, fields, in
   </span>
 }
 
+// this will used for the loading icons show
 const renderLoading=({message , size})=>{
   return <center> <h3>{message}</h3> <CircularProgress size={size} /> </center>
-} 
+}
+
+// this method will used for the download the invoice table as pdf
+const dwonloadInvoice = () => {
+  let htmlTable = document.getElementById('invoiceProject');
+  html2canvas(htmlTable, {
+      allowTaint: true,
+      backgroundColor: "rgba(255, 255, 255, 1)",
+  }).then((canvas) => {
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'pt', 'a4');
+      pdf.addImage(imgData, 'PNG', 25, 70);
+      pdf.save("downloadInvoice.pdf");
+  });
+}
+
+// this will used render matrial checkbox 
+const renderMatiralCheckbox = props => (
+  <CheckBox label={props.label}
+    checked={props.value ? true : false}
+    onCheck={props.onChange}/>
+)
+
+// render sankbar with alert
+const renderSanckbarAlert=(props)=>{
+  const { message, color }=props
+  return <Snackbar open={message !== ""} autoHideDuration={1500} anchorOrigin= {{ vertical: 'top', horizontal: 'right' }}>
+        <Alert severity={color}> {message} </Alert>
+    </Snackbar>
+}
 
 export{
     renderTextField,
@@ -235,5 +267,8 @@ export{
     renderAutocompleteWithProps,
     renderPasswordTextField,
     renderContact,
-    renderLoading
+    renderLoading,
+    dwonloadInvoice,
+    renderMatiralCheckbox,
+    renderSanckbarAlert
 }

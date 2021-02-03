@@ -127,7 +127,7 @@ class PurchaseOrderManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadPurchaseOrder = () => {
         const { loadPuchaseOrderList } = this.state
-        return <div>  {loadPuchaseOrderList ? renderLoading({ message:"Loading Purchase Order Management", size:80 }) : this.loadingPurchaseOrderTable()} </div>
+        return <div>  {loadPuchaseOrderList ? renderLoading({message:"Purchase Order Management",size:80}): this.loadingPurchaseOrderTable()} </div>
     }
 
     // this method used for load the client table
@@ -137,7 +137,7 @@ class PurchaseOrderManagement extends Component {
             <PurchaseOrderTable operation={operation} createPurchaseOrder={this.handleCreatePurchaseOrder} viewPurchaseOrder={this.viewPuchaseOrderDetails} deletePuchaseOrder={this.handleDeleteModel} />
         </>
     }
-
+   
     // this method called when we click the view button in client table
     viewPuchaseOrderDetails = (data, operation) => { this.handleCreatePurchaseOrder(data, operation) }
 

@@ -7,7 +7,6 @@ import * as MasterDataAction from "../../redux/actions/MasterDataAction"
 import * as ClientAction from "../../redux/actions/ClientAction"
 import * as PurchaseOrderAction from "../../redux/actions/PurchaseOrderAction"
 import * as FileAction from "../../redux/actions/FileAction"
-import { GetProjectRevenueData } from "../../redux/actions/DashboardAction"
 import { loadMessage } from "../../redux/actions/ClientAction"
 import { bindActionCreators } from 'redux';
 import { API_EXE_TIME } from '../../assets/config/Config';
@@ -29,24 +28,28 @@ class ProjectManagement extends Component {
      }
     
     componentDidMount=async()=>{
-        const { listOfClient, color } = this.props.ClientState;
+        const { dispatch }=this.props
+        const { listOfClient } = this.props.ClientState;
         const { projectList }= this.props.ProjectState
         const { authorization }= this.props.LoginState
         const { purchaseOrderList }= this.props.PurchaseOrderState
-        const { Domains, ManagerList, ExpenseTypeList, EmployeeList } = this.props.MasterDataSet;
-        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList } = this.props.MasterDataAction;
+        const { Domains, ManagerList, ExpenseTypeList, EmployeeList, SkillCategory, SkillSet, projectBillingModelList } = this.props.MasterDataSet;
+        const { GetDomains, GetManagerList, GetExpenseTypeList, GetEmployeeList, GetSkillSet, GetSkillCategory, GetProjectBillingTypeList } = this.props.MasterDataAction;
         const { GetProjectList }= this.props.ProjectAction
         const { GetClientList } = this.props.ClientAction;
         const { GetPurchaseOrderList }= this.props.PurchaseOrderAction
         await this.handleLoadProjectList();
         (Domains && Domains.length === 0) && await GetDomains(0, 10, authorization);
+        (SkillCategory && SkillCategory.length ===0) && GetSkillCategory(0,10,authorization);
+        (SkillSet && SkillSet.length ===0) && GetSkillSet(0,10,authorization);
         (ManagerList && ManagerList.length === 0) && await GetManagerList(0,10,authorization);
         (ExpenseTypeList && ExpenseTypeList.length === 0) && await GetExpenseTypeList(0,20,authorization);
-        (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,20,authorization);
+        (EmployeeList && EmployeeList.length === 0) && await GetEmployeeList(0,100,authorization);
         (listOfClient && listOfClient.length === 0) && await GetClientList(0,20,authorization);
+        (projectBillingModelList && projectBillingModelList.length === 0) && await GetProjectBillingTypeList(0,20,authorization);
         (purchaseOrderList && purchaseOrderList.length === 0) && await GetPurchaseOrderList(0,20,authorization);
         (projectList && projectList.length === 0) && await GetProjectList(0,20,authorization);
-        color && await loadMessage();
+        await dispatch(loadMessage());
         await this.handleLoadProjectList();
     }
 
@@ -54,7 +57,7 @@ class ProjectManagement extends Component {
     handleLoadProjectList = () => { this.setState({ loadProjectList: !this.state.loadProjectList }) }
 
     // this method used for the from actions in project 
-    handleProjectFromActions = (projectData,operation,showTabsOps) => {  this.setState({ fromAction: !this.state.fromAction, projectData, operation, showTabs: showTabsOps ? true: false  }) }
+    handleProjectFromActions = (projectData,operation,showTabsOps) => { this.setState({ fromAction: !this.state.fromAction, projectData, operation, showTabs: showTabsOps ? true: false  }) }
 
     // this method used for the load the delete model
     handleDeleteModel = (projectData) => { this.setState({ deleteModel: !this.state.deleteModel, projectData }) };
@@ -71,8 +74,7 @@ class ProjectManagement extends Component {
     }
 
     uploadContractFile=async(fileData,name,type)=>{
-        const { SaveFileDetails, SaveFileData }= this.props.FileAction
-        const { dispatch }=this.props
+        const {SaveFileDetails, SaveFileData}= this.props.FileAction
         const { authorization } = this.props.LoginState
         let newFileData=[{
             "fileName":name,
@@ -83,7 +85,7 @@ class ProjectManagement extends Component {
         await this.handleProjectContractFileUplaod();
         await SaveFileDetails(newFileData, authorization)
         setTimeout(async () => {
-            await dispatch(loadMessage());
+            await loadMessage()
             await SaveFileData();
             await this.handleProjectContractFileUplaod();
         }, API_EXE_TIME)
@@ -118,7 +120,7 @@ class ProjectManagement extends Component {
     // this method main framework which calling load PurchaseOrder table method
     loadProjectTable = () => {
         const { loadProjectList } = this.state
-        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? renderLoading({message:" Loading Project Mangement", size:80}):this.loadingProjectTable()} </div>
+        return < div style={{ paddingRight: 10 }}>  {loadProjectList ? renderLoading({message:"Project Management", size:80}):this.loadingProjectTable()} </div>
     }
 
     // this method used for load the client table
@@ -133,7 +135,8 @@ class ProjectManagement extends Component {
         />
     </>
     }
-    
+
+    // this method will used for the delete project model
     loadDeleteModel = () => {
         const { deleteModel, projectData } = this.state
         const { id, projectName } = projectData  ? projectData : ''
@@ -152,22 +155,23 @@ class ProjectManagement extends Component {
 
     // this method used for the call the save project api
     SaveProject=async(propsData)=>{
-        const { sendUserValues, setLoading}= propsData
+        const { values, setProjectLoad }=propsData
         const { projectContractFileUrl }=this.state
+        const { dispatch }=this.props
         const { SaveProjectRecord, GetProjectList } = this.props.ProjectAction;
         const { authorization } = this.props.LoginState
         const newProjectData = {
-            ...sendUserValues,
-            "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? sendUserValues.contractAttachmentUrl  : projectContractFileUrl,
+            ...values,
+            "purchaseOrder":values.purchaseOrder && values.purchaseOrder.title,
+            "contractAttachmentUrl":(projectContractFileUrl === "" || projectContractFileUrl === undefined) ? values.contractAttachmentUrl  : projectContractFileUrl,
             "active": true,
         }
-        await setLoading(true);
+        await setProjectLoad(true);
         await SaveProjectRecord(newProjectData, authorization)
         setTimeout(async () => {
-            await loadMessage()
-            await GetProjectRevenueData(authorization,{});
+            await dispatch(loadMessage());
             await GetProjectList(0, 20, authorization);
-            await setLoading(false);
+            await setProjectLoad(false);
             this.handleShowTabs(FromActions.VIED);
         }, API_EXE_TIME)
     }
@@ -179,7 +183,6 @@ class ProjectManagement extends Component {
         projectId && await DeleteProjectRecord(projectId, authorization);
         setTimeout(async () => {
             await loadMessage();
-            await GetProjectRevenueData(authorization,{});
             await GetProjectList(0, 20, authorization);
             await this.handleDeleteModel();
             await this.handleLoadProjectList();

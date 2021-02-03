@@ -29,8 +29,7 @@ public class InvoicePDFEntity extends BaseEntity<String> {
 	@GenericGenerator(name = "uuid", strategy = "uuid2")
 	@Column(name = "id", nullable = false, length = 100)
 	private String id;
-	
-	
+
 	@Column
 	private String clientId;
 
@@ -102,7 +101,20 @@ public class InvoicePDFEntity extends BaseEntity<String> {
 
 	@Column
 	private String totalBillingInWords;
-	
+
 	@Column
 	private String poid;
+
+	@Column
+	private Date invoiceDueDate;
+
+	@Column
+	private String paid;
+
+	@Column
+	private String description;
+
+	@Column
+	private String billingType;
+
 }

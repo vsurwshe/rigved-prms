@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -167,7 +169,7 @@ public class RegistrationController {
 		}
 	}
 
-	public void readSheet(Sheet sheet) {
+	public void readSheet(Sheet sheet) throws ParseException {
 		for (Row row : sheet) // iteration over row using for each loop
 		{
 
@@ -230,6 +232,12 @@ public class RegistrationController {
 						}
 						if (cell.getColumnIndex() == 10) {
 							registrationDto.setSecounderySkill(cell.getStringCellValue());
+						}
+						if (cell.getColumnIndex() == 12) {
+							registrationDto.setDOB(new SimpleDateFormat("dd/MM/yyyy").parse(cell.getStringCellValue()));
+						}
+						if (cell.getColumnIndex() == 15) {
+							registrationDto.setJoiningDate(new SimpleDateFormat("dd/MM/yyyy").parse(cell.getStringCellValue()));
 						}
 						if (cell.getColumnIndex() == 13) {
 							registrationDto.setUserType(cell.getStringCellValue());

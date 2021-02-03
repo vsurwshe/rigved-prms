@@ -14,6 +14,8 @@ public interface ClientDetailRepository extends CrudRepository<ClientDetailsEnti
 
 	ClientDetailsEntity findByIdAndActive(String id, Boolean active);
 
+	List<ClientDetailsEntity> findByGstNumOrTanNumAndActiveTrue(String gstNum, String tanNum);
+
 	List<ClientDetailsEntity> findByClientNameContaining(String clientName, Pageable page);
 
 	List<ClientDetailsEntity> findAllByActiveTrueOrderByCreatedOnDesc(Pageable page);

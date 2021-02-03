@@ -48,6 +48,7 @@ const structure = [
   { id: 14, label: 'Background', link: '', icon: <Dot size="small" color="secondary" /> },
 ];
 
+
 const SidebarView = ({ classes, theme, toggleSidebar, isSidebarOpened, isPermanent, location }) => {
   return (
     <Drawer

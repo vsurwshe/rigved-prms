@@ -6,11 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 import javax.transaction.Transactional;
 
@@ -26,22 +23,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MultiValueMap;
 
 import com.rvtech.prms.common.AddressDto;
-import com.rvtech.prms.common.GraphDto;
 import com.rvtech.prms.common.BankDetailsDto;
 import com.rvtech.prms.common.ClientDetailDto;
 import com.rvtech.prms.common.ContactPersonDto;
 import com.rvtech.prms.common.DBClientDataDto;
 import com.rvtech.prms.common.FilterDto;
-import com.rvtech.prms.common.MasterDataDto;
-import com.rvtech.prms.common.PurchaseOrderDto;
+import com.rvtech.prms.common.GraphDto;
 import com.rvtech.prms.common.RateCardDto;
 import com.rvtech.prms.constant.Constants;
-import com.rvtech.prms.controller.DashBoardController;
 import com.rvtech.prms.entity.AddressDetailsEntity;
 import com.rvtech.prms.entity.BankDetailsEntity;
 import com.rvtech.prms.entity.ClientDetailsEntity;
 import com.rvtech.prms.entity.ContactPersonEntity;
-import com.rvtech.prms.entity.PurchaseOrderEntity;
 import com.rvtech.prms.entity.RateCardEntity;
 import com.rvtech.prms.repository.AddressRepository;
 import com.rvtech.prms.repository.BankDetailsRepository;
@@ -88,10 +81,13 @@ public class ClientDetailServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, "Client deleted successfully");
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Client deleted successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 				headers.add(Constants.MESSAGE, "No data available");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
+				responceMap.put(Constants.MESSAGE, "No data available");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -99,6 +95,7 @@ public class ClientDetailServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "No data available");
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 
@@ -109,7 +106,6 @@ public class ClientDetailServiceImpl {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 		List<Map<String, String>> clientId = new ArrayList<Map<String, String>>();
 		List<Map<String, Float>> clientData = new ArrayList<Map<String, Float>>();
-		int update;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		// Fetching all clients with ids
@@ -141,7 +137,7 @@ public class ClientDetailServiceImpl {
 			Calendar calendar = Calendar.getInstance();
 			// To calculet how many month data have to fetch
 			int endMonth = 0;
-			int queryYear = 0;
+			// int queryYear = 0;
 			if (calendar.get(Calendar.MONTH) > 2) {
 				endMonth = calendar.get(Calendar.MONTH) - 2;
 				calendar.set(calendar.get(Calendar.YEAR), 3, 1);
@@ -202,17 +198,14 @@ public class ClientDetailServiceImpl {
 	public ResponseEntity<?> employesAttendenceData(FilterDto filterDto) {
 		List<GraphDto> attendanceData = new ArrayList<GraphDto>();
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-
-		int update;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		// Fetching all clients with ids
-
 		try {
 			Calendar calendar = Calendar.getInstance();
 			// To calculet how many month data have to fetch
 			int endMonth = 0;
-			int queryYear = 0;
+			// int queryYear = 0;
 			if (calendar.get(Calendar.MONTH) > 2) {
 				endMonth = calendar.get(Calendar.MONTH) - 2;
 				calendar.set(calendar.get(Calendar.YEAR), 3, 1);
@@ -252,10 +245,10 @@ public class ClientDetailServiceImpl {
 
 	public ResponseEntity<?> readClientWiseBilledData(FilterDto filterDto) {
 		DBClientDataDto dBClientDataDto = new DBClientDataDto();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
+		// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM");
 		List<Map<String, String>> clientId = new ArrayList<Map<String, String>>();
 		List<Map<String, Float>> clientData = new ArrayList<Map<String, Float>>();
-		int update;
+		// int update;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		// Fetching all clients with ids
@@ -288,7 +281,7 @@ public class ClientDetailServiceImpl {
 			// calendar.set(2021, 02, 01);
 			// To calculet how many month data have to fetch
 			int endMonth = 0;
-			int queryYear = 0;
+			// int queryYear = 0;
 			if (calendar.get(Calendar.MONTH) > 2) {
 				endMonth = calendar.get(Calendar.MONTH) - 2;
 				calendar.set(calendar.get(Calendar.YEAR), 3, 1);
@@ -333,14 +326,29 @@ public class ClientDetailServiceImpl {
 	}
 
 	public ResponseEntity<?> create(ClientDetailDto clientDetailDto) {
+		ClientDetailsEntity clientDetailsEntity = null;
+		responceMap = new HashMap<String, Object>();
+		headers = Utilities.getDefaultHeader();
+		// Validate client TanNumber and GSTN
+		try {
+			List<ClientDetailsEntity> clientDetailsEntityList = clientDetailRepository
+					.findByGstNumOrTanNumAndActiveTrue(clientDetailDto.getGstNum(), clientDetailDto.getTanNum());
+			if (clientDetailsEntityList != null && clientDetailsEntityList.size() != 0) {
+				headers.add(Constants.STATUS, HttpStatus.CONFLICT.toString());
+				headers.add(Constants.MESSAGE, "Client exist");
+				responceMap.put("Status", HttpStatus.CONFLICT);
+				responceMap.put(Constants.MESSAGE, "Client exist");
+				return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
+
+			}
+		} catch (Exception exception) {
+			logger.error("ClientDetailServiceImpl:create:error while creating new client");
+		}
 		List<BankDetailsEntity> bankDetailEntitySet = new ArrayList<BankDetailsEntity>();
 		List<AddressDetailsEntity> addressDetailsEntities = new ArrayList<AddressDetailsEntity>();
 		List<ContactPersonEntity> contactPersonEntities = new ArrayList<ContactPersonEntity>();
 		List<RateCardEntity> rateCardEntities = new ArrayList<RateCardEntity>();
 
-		ClientDetailsEntity clientDetailsEntity = null;
-		responceMap = new HashMap<String, Object>();
-		headers = Utilities.getDefaultHeader();
 		try {
 			clientDetailsEntity = clientDetailRepository
 					.save(GenericMapper.mapper.map(clientDetailDto, ClientDetailsEntity.class));
@@ -427,22 +435,25 @@ public class ClientDetailServiceImpl {
 			}
 			if (clientDetailsEntity.getId() != null) {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
-				headers.add(Constants.MESSAGE, "PO Detail created successfully");
+				headers.add(Constants.MESSAGE, "Client created successfully");
 				responceMap.put("Id", clientDetailsEntity.getId());
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Client created successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
-				responceMap.put("Id", clientDetailsEntity.getId());
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+				responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", clientDetailsEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
 		}
 
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
@@ -451,7 +462,7 @@ public class ClientDetailServiceImpl {
 
 	public ResponseEntity<?> read(String id) {
 		ClientDetailDto clientDetailDto;
-		Optional<PurchaseOrderEntity> purchaseOrderEntity = null;
+		// Optional<PurchaseOrderEntity> purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		ClientDetailsEntity clientDetailsEntity = null;
@@ -466,8 +477,10 @@ public class ClientDetailServiceImpl {
 
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
-				headers.add(Constants.MESSAGE, "No data available");
+				headers.add(Constants.MESSAGE, "Client detail not present");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
+				responceMap.put(Constants.MESSAGE, "Client detail not present");
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -475,6 +488,8 @@ public class ClientDetailServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 
@@ -586,7 +601,7 @@ public class ClientDetailServiceImpl {
 	public ResponseEntity<?> search(int pageIndex, int pageSize, String clientName) {
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		List<ClientDetailDto> dtos = new ArrayList<ClientDetailDto>();
-		ClientDetailsEntity purchaseOrderEntity = null;
+		// ClientDetailsEntity purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		try {
@@ -594,7 +609,7 @@ public class ClientDetailServiceImpl {
 					.findByClientNameContaining(clientName, page);
 			if (clientDetailsEntities != null && !clientDetailsEntities.isEmpty()) {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
-				headers.add(Constants.MESSAGE, "PO Detail featched successfully");
+				headers.add(Constants.MESSAGE, "Client Detail featched successfully");
 				for (ClientDetailsEntity orderEntity : clientDetailsEntities) {
 					dtos.add(GenericMapper.mapper.map(orderEntity, ClientDetailDto.class));
 				}
@@ -603,6 +618,7 @@ public class ClientDetailServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 				headers.add(Constants.MESSAGE, "No data available");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
+				responceMap.put(Constants.MESSAGE, "Client data not available by search clientName");
 
 			}
 		} catch (Exception e) {
@@ -610,8 +626,9 @@ public class ClientDetailServiceImpl {
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", purchaseOrderEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
@@ -621,7 +638,6 @@ public class ClientDetailServiceImpl {
 	public ResponseEntity<?> listOfClien(int pageIndex, int pageSize) {
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		List<ClientDetailDto> dtos = new ArrayList<ClientDetailDto>();
-		ClientDetailsEntity purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		try {
@@ -629,7 +645,7 @@ public class ClientDetailServiceImpl {
 					.findAllByActiveTrueOrderByCreatedOnDesc(page);
 			if (clientDetailsEntities != null && !clientDetailsEntities.isEmpty()) {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
-				headers.add(Constants.MESSAGE, "PO Detail featched successfully");
+				headers.add(Constants.MESSAGE, "Client detail featched successfully");
 				for (ClientDetailsEntity orderEntity : clientDetailsEntities) {
 					dtos.add(readOtherData(GenericMapper.mapper.map(orderEntity, ClientDetailDto.class)));
 				}
@@ -638,6 +654,7 @@ public class ClientDetailServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 				headers.add(Constants.MESSAGE, "No data available");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
+				responceMap.put(Constants.MESSAGE, "No data available");
 
 			}
 		} catch (Exception e) {
@@ -645,8 +662,10 @@ public class ClientDetailServiceImpl {
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", purchaseOrderEntity.getId());
+			// responceMap.put("Id", purchaseOrderEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 

@@ -12,34 +12,13 @@ const RegsiterTable=(props)=>{
 
     // creating columns
     const columns = [
-        { title: 'Sr.\u00a0No.', field: 'key', width: 5 },
+        { title: 'Sr.\u00a0No.', field: 'key', width: 1 },
         { title: 'Name', field: 'name' },
-        { title: 'Code', field: 'employeeNumber',width: 10 },
+        { title: 'Code', field: 'employeeNumber' },
         { title: 'Email', field: 'emailId' },
         { title: 'Designation', field: 'designation' },
         { title: 'Mobile\u00a0Number', field: 'mobileNumber', width: 10 },
         { title: 'Last\u00a0Attendance\u00a0Date', field: 'lastUploadedAttendance'},
-        // {
-        //   title: "",
-        //   width:8,
-        //   render: (rowData)=> {
-        //       return<VisibilityIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.VI,true)} />
-        //   }
-        // },
-        // {
-        //   title: "",
-        //   width:8,
-        //   render: (rowData)=> {
-        //       return<CreateIcon variant="contained" color="primary" onClick={()=>fromAction(rowData.data,FromActions.ED,true)} />
-        //   }
-        // },
-        // {
-        //   title: "",
-        //   width:8,
-        //   render: (rowData)=> {
-        //       return <DeleteOutlineIcon variant="contained" color="secondary" onClick={()=>console.log("Delete method called ",rowData)} />
-        //   }
-        // }  
   ];
 
   // Creating rows

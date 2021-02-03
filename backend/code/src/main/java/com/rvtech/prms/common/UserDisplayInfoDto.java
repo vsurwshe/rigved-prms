@@ -30,8 +30,14 @@ public class UserDisplayInfoDto implements Serializable {
 	
 	private String domain;
 	
-	private Date latestAttFromDate;
+	private String latestAttFromDate;
 	
-	private Date latestAttToDate;
+	private String latestAttToDate;
+	
+	private Float expInYears;
+	
+	private String primerySkill;// (Multiple comma suparated )
+
+
 
 }

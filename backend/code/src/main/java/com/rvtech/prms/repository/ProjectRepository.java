@@ -14,21 +14,23 @@ import com.rvtech.prms.entity.ProjectEntity;
 public interface ProjectRepository extends CrudRepository<ProjectEntity, String> {
 
 	Optional<ProjectEntity> findById(String id);
-	
-	@Query(value="SELECT * FROM project WHERE id=:ProjectId", nativeQuery = true)
-	ProjectEntity findByIdEntity(@Param("ProjectId")String ProjectId);
+
+	@Query(value = "SELECT * FROM project WHERE id=:ProjectId", nativeQuery = true)
+	ProjectEntity findByIdEntity(@Param("ProjectId") String ProjectId);
 
 	List<ProjectEntity> findAllByProjectNameOrClientNameContainingOrClientIdContainingAndActive(String projectName,
 			String clientName, String clientId, Boolean active, Pageable page);
 
 	List<ProjectEntity> findAllByActive(Boolean active, Pageable page);
-	
+
 	List<ProjectEntity> findAllByActive(Boolean active);
-	
+
 	List<ProjectEntity> findByClientId(String clientId);
-	
 
 	@Modifying(clearAutomatically = true)
 	@Query("UPDATE ProjectEntity c SET c.active = :active WHERE c.id = :projId")
 	int updateActive(@Param("projId") String expId, @Param("active") Boolean active);
+
+	@Query(value = "SELECT count(*) FROM projectemployemapping where active=1 and projectId=:projectId", nativeQuery = true)
+	int employeeCount(@Param("projectId") String projectId);
 }

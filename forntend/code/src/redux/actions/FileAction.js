@@ -1,4 +1,4 @@
-import { API_URL } from '../../assets/config/Config';
+import { AlertColor, API_URL } from '../../assets/config/Config';
 import { CreateInstance } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
@@ -12,8 +12,16 @@ const SaveFileDetails = (fileData, authroizationKey) => {
                     Authorization: authroizationKey
                 }
             })
-            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveFileData, "loadMessage":loadMessage, response, message:response.data[0]}) })
-            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+            .then(response => { SuccessFunction({ dispatch , "successMethod": SaveFileData, "loadMessage":loadMessage, response, message:response.data[0]+" Your excel file is uploaded is successfully"}) })
+            .catch(error => {
+                console.log("Error ",error.response,error.response.status); 
+                switch (error && error.response && error.response.status) {
+                    case 409:
+                        return dispatch(loadMessage(AlertColor.danger, 409+" Error occured"));  
+                    default:
+                        return ErrorFunction({dispatch,"loadMessage":loadMessage, error}) 
+                }
+            })
     }
 }
 

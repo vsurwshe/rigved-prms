@@ -44,7 +44,6 @@ public class PurchaseOrderServiceImpl {
 	private PurchaseOrderRepository purchaseOrderRepository;
 
 	public ResponseEntity<?> savePODeatils(PurchaseOrderDto purchaseOrderDto) {
-
 		PurchaseOrderEntity purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
@@ -56,18 +55,19 @@ public class PurchaseOrderServiceImpl {
 				headers.add(Constants.MESSAGE, "PO Detail created successfully");
 				responceMap.put("Id", purchaseOrderEntity.getId());
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "PO Detail created successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
-				responceMap.put("Id", purchaseOrderEntity.getId());
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+				responceMap.put(Constants.MESSAGE, "Something went wrong");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", purchaseOrderEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
@@ -78,12 +78,11 @@ public class PurchaseOrderServiceImpl {
 	public ResponseEntity<?> search(int pageIndex, int pageSize, String clientName) {
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		List<PurchaseOrderDto> dtos = new ArrayList<PurchaseOrderDto>();
-		PurchaseOrderEntity purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		try {
 			List<PurchaseOrderEntity> purchaseOrderEntityList = purchaseOrderRepository
-					.findByClientNameContainingOrClientIdContaining(clientName,clientName, page);
+					.findByClientNameContainingOrClientIdContaining(clientName, clientName, page);
 			if (purchaseOrderEntityList != null && !purchaseOrderEntityList.isEmpty()) {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, "PO Detail featched successfully");
@@ -94,16 +93,17 @@ public class PurchaseOrderServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 				headers.add(Constants.MESSAGE, "No data available");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
-				return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "No data available");
 
+				return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", purchaseOrderEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
 		}
 
 		return new ResponseEntity<>(dtos, headers, HttpStatus.OK);
@@ -113,7 +113,6 @@ public class PurchaseOrderServiceImpl {
 	public ResponseEntity<?> listOfPO(int pageIndex, int pageSize) {
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		List<PurchaseOrderDto> dtos = new ArrayList<PurchaseOrderDto>();
-		PurchaseOrderEntity purchaseOrderEntity = null;
 		responceMap = new HashMap<String, Object>();
 		headers = Utilities.getDefaultHeader();
 		try {
@@ -136,8 +135,9 @@ public class PurchaseOrderServiceImpl {
 			logger.error("PurchaseOrderServiceImpl::saveCarDeatils::" + e.getMessage());
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
-			responceMap.put("Id", purchaseOrderEntity.getId());
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 

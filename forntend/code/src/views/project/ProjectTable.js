@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from "react-redux";
 import MaterialTable from "material-table";
-import Checkbox from '@material-ui/core/Checkbox';
+// import Checkbox from '@material-ui/core/Checkbox';
 import { Button } from '@material-ui/core';
 import { FromActions } from '../../assets/config/Config';
 import CreateIcon from '@material-ui/icons/Create';
@@ -18,15 +18,8 @@ const ProjectTable = (props) => {
     { title: 'Sr.\u00a0No.', field: 'key', width: 20 },
     { title: 'Project\u00a0Name', field: 'projectName' },
     { title: 'Client\u00a0Name', field: 'clientName' },
-    { title: 'Resources', field: 'resource', width: 30 },
-    {
-      title: "PO\u00a0Recieved",
-      width: 8,
-      render: (rowData) => {
-        return <Checkbox onChange={() => console.log("Checkbox Clicked")} name="jason" />
-      }
-    },
-    { title: 'Status', field: 'status', width: 60 },
+    { title: 'Resources', field: 'empCount', width: 30 },
+    { title: 'Billing\u00a0Type', field: 'projectBillingType', width: 30 },
     {
       title: "",
       width:8,
@@ -52,14 +45,14 @@ const ProjectTable = (props) => {
 
   // Creating rows
   const data = (projectList && projectList.length > 0) && projectList.map((item, key) => {
-    return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName }
+    return { "key": (key + 1), "data": item, "projectName": item.projectName, "clientName": item.clientName, ...item }
   });
 
   return <div style={{ maxWidth: "100%" }}>
     <MaterialTable
       title="Project Managment"
       columns={columns}
-      data={(data && data.length > 0) ? data : []}
+      data={data.length > 0 ? data : []}
       options={{
         headerStyle: { backgroundColor: '#01579b', color: '#FFF' }
       }}

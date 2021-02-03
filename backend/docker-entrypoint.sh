@@ -19,8 +19,8 @@ check_git_available(){
 remove_old_content(){
    if [ "$(ls -A $dir)" ]
     then 
-     mkdir /home/dummy &&
-     cp -a . /home/dummy &&
+    #  mkdir /home/dummy &&
+     cp -af . /home/ &&
      rm -r *
     fi
 }
@@ -31,8 +31,9 @@ fetch_project(){
     if [ "$inside_git_repo" ]; then
       echo "you are inside git repo"
        git remote set-url origin https://$username:$password@gitlab.com/joshi.rites/rigved-prms-backend.git &&
-       git branch -a &&
-       git fetch origin master
+       git branch &&
+       git pull origin master
+       git log -1 --stat --oneline
     else
       echo "you are not in git repo"
       remove_old_content &&

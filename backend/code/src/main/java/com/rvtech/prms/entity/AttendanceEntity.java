@@ -7,6 +7,8 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Table;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
 
 import org.hibernate.annotations.GenericGenerator;
 
@@ -40,22 +42,26 @@ public class AttendanceEntity {
 
 	@Column
 	private String companyName;
+	
+	@Column(columnDefinition = "BLOB")
+	private String dayCalculation;
 
-	@Column(columnDefinition = "TEXT")
-	private String dayPresent;
 
-	@Column(columnDefinition = "TEXT")
-	private String weekOff;
-
-	@Column(columnDefinition = "TEXT")
-	private String halfDay;
-
-	@Column(columnDefinition = "TEXT")
-	private String absent;
-
+	/*
+	 * @Column(columnDefinition = "TEXT") private String dayPresent;
+	 * 
+	 * @Column(columnDefinition = "TEXT") private String weekOff;
+	 * 
+	 * @Column(columnDefinition = "TEXT") private String halfDay;
+	 * 
+	 * @Column(columnDefinition = "TEXT") private String absent;
+	 * 
+	 */	
+	@Temporal(TemporalType.DATE)
 	@Column
 	private Date fromDate;
-
+	
+	@Temporal(TemporalType.DATE)
 	@Column
 	private Date toDate;
 	

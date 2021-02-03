@@ -1,5 +1,7 @@
 package com.rvtech.prms.services;
 
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -42,6 +44,41 @@ public class AttendanceServiceImpl {
 
 	private Map<String, Object> responceMap;
 
+	public int checkAttendanceEntry(Date fromDate, Date toDate, String empId) {
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		int attendanceCount = 0;
+		try {
+			attendanceCount = attendanceRepository.findAttendanceEntry(date.format(fromDate), date.format(toDate),
+					empId);
+		} catch (Exception ex) {
+			logger.error("AttendanceServiceImpl:checkAttendanceEntry:" + ex.getMessage());
+		}
+		return attendanceCount;
+
+	}
+
+	public ResponseEntity<?> attendanceList(String accId) {
+		headers = Utilities.getDefaultHeader();
+		SimpleDateFormat date = new SimpleDateFormat("yyyy-MM-dd");
+		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
+		List<String> attendanceList = null;
+		try {
+			attendanceList = attendanceRepository.findAllAttendanceToAndFromDate(accId);
+			if (attendanceList != null && attendanceList.size() != 0) {
+				for (String string : attendanceList) {
+					Map<String, String> map = new HashMap<String, String>();
+					map.put("fromDate", string.split(",")[0]);
+					map.put("startDate", string.split(",")[1]);
+					list.add(map);
+				}
+			}
+		} catch (Exception ex) {
+			logger.error("AttendanceServiceImpl:checkAttendanceEntry:" + ex.getMessage());
+		}
+		return new ResponseEntity<>(list, headers, HttpStatus.OK);
+
+	}
+
 	public void create(List<AttendanceDto> attendanceDtos) {
 		AttendanceEntity attendanceEntity = null;
 		responceMap = new HashMap<String, Object>();
@@ -50,8 +87,10 @@ public class AttendanceServiceImpl {
 			for (AttendanceDto attendanceDto : attendanceDtos) {
 				if (attendanceDto.getEmployeeName() != null) {
 					attendanceDto.setAccountId(userInfoRepository.findAccountIdByEmpId(attendanceDto.getEmployeeId()));
-					attendanceEntity = GenericMapper.mapper.map(attendanceDto, AttendanceEntity.class);
-					attendanceEntity = attendanceRepository.save(attendanceEntity);
+					if (attendanceDto.getAccountId() != null) {
+						attendanceEntity = GenericMapper.mapper.map(attendanceDto, AttendanceEntity.class);
+						attendanceEntity = attendanceRepository.save(attendanceEntity);
+					}
 				}
 			}
 			if (attendanceEntity.getId() != null) {
@@ -59,10 +98,13 @@ public class AttendanceServiceImpl {
 				headers.add(Constants.MESSAGE, "Attendance Detail created successfully");
 				responceMap.put("Id", attendanceEntity.getId());
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Attendance Detail created successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+				responceMap.put(Constants.MESSAGE, "Something went wrong");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -70,6 +112,8 @@ public class AttendanceServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 
 	}

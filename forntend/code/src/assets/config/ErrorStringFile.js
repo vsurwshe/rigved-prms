@@ -4,6 +4,11 @@ const InvoiceError={
     "INTERNAL_SERVER_ERROR": "Something went worng"
 }
 
+const ProjectResourceError={
+    "CONFLICT":"Assigning resource is already assiend to another project ",
+}
+
 export {
-    InvoiceError
+    InvoiceError,
+    ProjectResourceError
 }

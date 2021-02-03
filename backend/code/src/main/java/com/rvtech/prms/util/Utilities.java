@@ -193,6 +193,8 @@ public class Utilities {
 		exposeHeaders.append(Constants.STATUS);
 		exposeHeaders.append(",");
 		exposeHeaders.append(Constants.MESSAGE);
+		exposeHeaders.append(",");
+		exposeHeaders.append(Constants.BILLING_TYPE);
 		headers.add(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, exposeHeaders.toString());
 		return headers;
 	}

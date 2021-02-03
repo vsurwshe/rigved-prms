@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button, Grid, Accordion, AccordionSummary, AccordionDetails } from "@material-ui/core";
+import { Button, Grid, Accordion, AccordionSummary, AccordionDetails} from "@material-ui/core";
 import { Field, reduxForm, reset } from 'redux-form';
 import { renderTextField, renderAutocompleteByName, renderDateTimePicker, radioButton, renderNumberField, renderFileInput, renderPasswordTextField, renderLoading } from '../utilites/FromUtilites';
 import useStyles from "./styles";
@@ -58,7 +58,7 @@ const PersonalInfo = (props) => {
         <AccordionSummary aria-label="Expand" aria-controls="additional-actions1-content"> PERSONAL INFORMATION</AccordionSummary>
         <AccordionDetails>
             <div>
-                {(profileImageUrl === "" || profileImageUrl === undefined) ? (profileImageUpload ? renderLoading({message:"Uploading..", size:40})
+                {(profileImageUrl === "" || profileImageUrl === undefined) ? (profileImageUpload ? renderLoading({message:"Uploading", size:80 })
                     : <Field name="profilePic" component={renderFileInput} fullWidth successFunction={profileImageUploadMethod} type="file" lable="Profile Image" />)
                     : <h5>{loadFileUrlName(profileImageUrl)}</h5>}
                 <Field name="designation" component={renderTextField} label="Job Title" style={{ margin: 8 }} fullWidth helperText="Ex. Java Full Stack Developer" margin="normal" InputLabelProps={{ shrink: true }} />

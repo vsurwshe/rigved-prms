@@ -13,12 +13,12 @@ import java.util.List;
 import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.Cell;
-import org.apache.poi.ss.usermodel.FormulaEvaluator;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,10 +39,12 @@ public class AttendanceController {
 	private AttendanceDto attendanceDto;
 	private List<AttendanceDto> attendanceList;
 	int month = 0;
-	private String dayPresent = "";
-	private String weekOff = "";
-	private String halfDay = " ";
-	private String abscent = " ";
+	/*
+	 * private String dayPresent = ""; private String weekOff = ""; private String
+	 * halfDay = " "; private String abscent = " ";
+	 */
+
+	private String dayCalculation=null;
 	int date = 0;
 	int year = 0;
 	Calendar calendar = Calendar.getInstance();
@@ -52,6 +54,11 @@ public class AttendanceController {
 	SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
 	@Autowired
 	private AttendanceServiceImpl attendanceServiceImpl;
+
+	@GetMapping(path = "/attendanceList/{accountId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<?> attendanceList(@PathVariable("accountId") String accountId) {
+		return attendanceServiceImpl.attendanceList(accountId);
+	}
 
 	/*
 	 * Reading attendance excel
@@ -98,13 +105,14 @@ public class AttendanceController {
 
 	public void attendCal(Date fromDate, Date toDate, Sheet sheet) {
 		rowCount = 0; // Keep track of row
+		int count_off_blank_cell = 0; // To keep count of blank count
 		for (Row row : sheet) // iteration over row using for each loop
 		{
 			// reseting calender
 			if (row.getRowNum() != 0) {
 				calendar.set(year, month, date);
 			}
-			dayPresent = " ";
+			dayCalculation = " ";
 			attendanceDto = new AttendanceDto();
 			dayCount = 0; // Resetting dayCount to 0, for new employee
 			// cellCount = 0; // keeping track of cell count
@@ -112,6 +120,11 @@ public class AttendanceController {
 			{
 
 				switch (cell.getCellType()) {
+				case Cell.CELL_TYPE_BLANK:
+
+					calendar.add(Calendar.DATE, 1);
+
+					break;
 				case Cell.CELL_TYPE_NUMERIC: // field that represents numeric cell type
 					// getting the value of the cell as a number
 					break;
@@ -121,13 +134,16 @@ public class AttendanceController {
 					attendanceDto.setToDate(toDate);
 					// getting the value of the cell as a string
 					if (rowCount == 0 && cell.getColumnIndex() == 5) {
+						calendar.setTime(fromDate);
 						String[] daystart = cell.getStringCellValue().split("\n");
 						date = Integer.valueOf(daystart[1].split("/")[0]) - 1;
 						month = Integer.valueOf(daystart[1].split("/")[1]) - 1;
 						year = calendar.get(Calendar.YEAR);
-						calendar.set(calendar.get(Calendar.YEAR), Integer.valueOf(month), Integer.valueOf(date));
+						calendar.set(Calendar.DATE, Integer.valueOf(date));
+						calendar.set(Calendar.MONTH, Integer.valueOf(month));
+						calendar.set(Calendar.YEAR, Integer.valueOf(year));
 					}
-					if (rowCount > 0) {
+					if (row.getRowNum() > 0) {
 						if (cell.getColumnIndex() == 0) {
 							attendanceDto.setEmployeeId(cell.getStringCellValue());
 						}
@@ -143,43 +159,58 @@ public class AttendanceController {
 						if (cell.getColumnIndex() == 4) {
 							attendanceDto.setCompanyName(cell.getStringCellValue());
 						}
+
 						// Counting week off
-						if (cell.getStringCellValue().equals("WO")) {
+
+						if (cell.getColumnIndex() > 4) {
 							calendar.add(Calendar.DATE, 1);
-							weekOff = weekOff + "," + dateFormat.format(calendar.getTime());
+							dayCalculation = dayCalculation.equals(" ")?" ":dayCalculation + ',';
+							dayCalculation = dayCalculation +  dateFormat.format(calendar.getTime()) + "("
+									+ cell.getStringCellValue() + ")";
 							if (attendanceDto.getFromDate() == null) {
 								attendanceDto.setFromDate(calendar.getTime());
-							} // cellCount++;// increasing cell count by 1
+							}
+							// cellCount++;//increasing cell count by 1
 						}
+
+						// Counting week off
+						/*
+						 * if (cell.getStringCellValue().equals("WO")) { calendar.add(Calendar.DATE, 1);
+						 * dayCalculation = dayCalculation + "," + dateFormat.format(calendar.getTime())
+						 * + "(" + cell.getStringCellValue() + ")"; if (attendanceDto.getFromDate() ==
+						 * null) { attendanceDto.setFromDate(calendar.getTime()); } // cellCount++;//
+						 * increasing cell count by 1 }
+						 */
 						// Counting day present
-						if (cell.getStringCellValue().equals("DP") || cell.getStringCellValue().equals("WOP")
-								|| cell.getStringCellValue().equals("PHP")) {
-							calendar.add(Calendar.DATE, 1);
-							dayPresent = dayPresent + "," + dateFormat.format(calendar.getTime());
-							if (attendanceDto.getFromDate() == null) {
-								attendanceDto.setFromDate(calendar.getTime());
-							}
-						}
+						/*
+						 * if (cell.getStringCellValue().equals("DP") ||
+						 * cell.getStringCellValue().equals("WOP") ||
+						 * cell.getStringCellValue().equals("PHP")) { calendar.add(Calendar.DATE, 1);
+						 * dayPresent = dayPresent + "," + dateFormat.format(calendar.getTime()) + "(" +
+						 * cell.getStringCellValue() + ")"; if (attendanceDto.getFromDate() == null) {
+						 * attendanceDto.setFromDate(calendar.getTime()); } }
+						 */
 						// Counting half day
-						if (cell.getStringCellValue().equals("ABS/DP") || cell.getStringCellValue().equals("DP/ABS")
-								|| cell.getStringCellValue().equals("PL/DP")
-								|| cell.getStringCellValue().equals("DP/PL")
-								|| cell.getStringCellValue().equals("PHP/PH")) {
-							calendar.add(Calendar.DATE, 1);
-							halfDay = halfDay + "," + dateFormat.format(calendar.getTime());
-							if (attendanceDto.getFromDate() == null) {
-								attendanceDto.setFromDate(calendar.getTime());
-							}
-						}
+						/*
+						 * if (cell.getStringCellValue().equals("ABS/DP") ||
+						 * cell.getStringCellValue().equals("DP/ABS") ||
+						 * cell.getStringCellValue().equals("PL/DP") ||
+						 * cell.getStringCellValue().equals("DP/PL") ||
+						 * cell.getStringCellValue().equals("PHP/PH")) { calendar.add(Calendar.DATE, 1);
+						 * halfDay = halfDay + "," + dateFormat.format(calendar.getTime()) + "(" +
+						 * cell.getStringCellValue() + ")"; if (attendanceDto.getFromDate() == null) {
+						 * attendanceDto.setFromDate(calendar.getTime()); } }
+						 */
 						// Counting leave or absent
-						if (cell.getStringCellValue().equals("ABS") || cell.getStringCellValue().equals("LWP")
-								|| cell.getStringCellValue().equals("PL") || cell.getStringCellValue().equals("PH")) {
-							calendar.add(Calendar.DATE, 1);
-							abscent = abscent + "," + dateFormat.format(calendar.getTime());
-							if (attendanceDto.getFromDate() == null) {
-								attendanceDto.setFromDate(calendar.getTime());
-							}
-						}
+						/*
+						 * if (cell.getStringCellValue().equals("ABS") ||
+						 * cell.getStringCellValue().equals("LWP") ||
+						 * cell.getStringCellValue().equals("PL") ||
+						 * cell.getStringCellValue().equals("PH")) { calendar.add(Calendar.DATE, 1);
+						 * abscent = abscent + "," + dateFormat.format(calendar.getTime()) + "(" +
+						 * cell.getStringCellValue() + ")"; if (attendanceDto.getFromDate() == null) {
+						 * attendanceDto.setFromDate(calendar.getTime()); } }
+						 */
 					}
 
 					break;
@@ -187,14 +218,20 @@ public class AttendanceController {
 
 			}
 			rowCount++;
-			attendanceDto.setAbsent(abscent);
-			attendanceDto.setHalfDay(halfDay);
-			attendanceDto.setWeekOff(weekOff);
-			attendanceDto.setDayPresent(dayPresent);
+			/*
+			 * attendanceDto.setAbsent(abscent); attendanceDto.setHalfDay(halfDay);
+			 * attendanceDto.setWeekOff(weekOff); attendanceDto.setDayPresent(dayPresent);
+			 */
+			attendanceDto.setDayCalculation(dayCalculation);
 			if (attendanceDto.getToDate() == null) {
 				attendanceDto.setToDate(calendar.getTime());
 			}
-			attendanceList.add(attendanceDto);
+
+			if (attendanceDto.getEmployeeId() != null
+					&& attendanceServiceImpl.checkAttendanceEntry(attendanceDto.getFromDate(),
+							attendanceDto.getToDate(), attendanceDto.getEmployeeId()) == 0) {
+				attendanceList.add(attendanceDto);
+			}
 
 		}
 	}

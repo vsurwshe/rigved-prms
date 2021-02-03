@@ -74,7 +74,7 @@ public class AccountServiceImpl {
 	public ResponseEntity<?> createUser(RegistrationDto registrationDto) {
 		param = new HashMap<String, String>();
 		UserAccountDto userAccountDto;
-		String accountId=null;
+		String accountId = null;
 		try {
 			userAccountDto = getByUserNameOrEmailForLogin(registrationDto.getMobileNumber());
 			if (userAccountDto == null) {
@@ -84,6 +84,8 @@ public class AccountServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.CONFLICT.toString());
 				headers.add(Constants.MESSAGE, "Mobile number or Email id already exist");
 				param.put("Status", HttpStatus.CONFLICT.toString());
+				param.put(Constants.MESSAGE, "Mobile number or Email id already exist");
+
 				return new ResponseEntity<>(param, headers, HttpStatus.CONFLICT);
 			}
 			// Checking Employee Id are already registered
@@ -94,6 +96,8 @@ public class AccountServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.CONFLICT.toString());
 				headers.add(Constants.MESSAGE, "Employee id already exist");
 				param.put("Status", HttpStatus.CONFLICT.toString());
+				param.put(Constants.MESSAGE, "Employee id already exist");
+
 				return new ResponseEntity<>(param, headers, HttpStatus.CONFLICT);
 			}
 
@@ -141,6 +145,8 @@ public class AccountServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, userInfoEntity.getUserType() + "register successfully");
 				param.put("Status", HttpStatus.OK.toString());
+				param.put(Constants.MESSAGE, userInfoEntity.getUserType() + "register successfully");
+
 			}
 		} catch (Exception exception) {
 			logger.error("AccountServiceImpl:createUser:" + exception.getMessage());

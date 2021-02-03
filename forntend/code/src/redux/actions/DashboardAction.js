@@ -2,6 +2,7 @@ import { CreateInstance } from '../../assets/config/APIConfig';
 import { loadMessage } from "../actions/ClientAction";
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
+// this method will get billing data
 const GetBillingData=(authroizationKey, filterData)=>{
     return (dispatch) => {
         return CreateInstance()
@@ -14,6 +15,7 @@ const GetBillingData=(authroizationKey, filterData)=>{
     }
 }
 
+// this method will get employee data
 const GetEmployeeData=(authroizationKey, filterData)=>{
     return (dispatch) => {
         return CreateInstance()
@@ -26,6 +28,7 @@ const GetEmployeeData=(authroizationKey, filterData)=>{
     }
 }
 
+// this method will get resource data
 const GetResourceData=(authroizationKey,filterData)=>{
     return (dispatch) => {
         return CreateInstance()
@@ -38,6 +41,7 @@ const GetResourceData=(authroizationKey,filterData)=>{
     }
 }
 
+// this method will get project revenue data
 const GetProjectRevenueData=(authroizationKey,filterData)=>{
     return (dispatch) => {
         return CreateInstance()
@@ -50,6 +54,7 @@ const GetProjectRevenueData=(authroizationKey,filterData)=>{
     }
 }
 
+// this method will get client revenue data
 const GetClientRevenueData=(authroizationKey,filterData)=>{
     return (dispatch) => {
         return CreateInstance()

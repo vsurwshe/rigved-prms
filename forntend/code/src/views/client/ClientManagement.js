@@ -136,7 +136,7 @@ class ClientManagment extends Component {
     // this method main framework which calling load client table method
     loadClientTable = () => {
         const { loadClientList } = this.state
-        return < div style={{ paddingRight: 10 }}> {loadClientList ? renderLoading({ message:"Loading Client Management", size:80}): this.loadingClientTable()} </div>
+        return < div style={{ paddingRight: 10 }}> {loadClientList ? renderLoading({message:"Client Managment",size:80}) : this.loadingClientTable()} </div>
     }
 
     // this method used for load the client table
@@ -146,13 +146,13 @@ class ClientManagment extends Component {
             <ClientTable  operation={operation} createClient={this.handleCreateClient} viewClientDetails={this.viewClientDetails}  deleteClientDetails={this.handleDeleteModel}  />
         </>
     }
-
+   
     // this method called when we click the view button in client table
     viewClientDetails = (data,operation) => {  this.handleCreateClient(data,operation)  }
 
     // this method used for the save the client details
     SaveClientDetails = async (propsData) => {
-        const { SaveClientData, loadMessage, GetClientList } = this.props.ClientAction;
+        const { SaveClientData, loadMessage, GetClientList, SaveClientDetails } = this.props.ClientAction;
         const { authorization } = this.props.LoginState
         const { clientDetails } = this.props.ClientState
         const { gstFileUrl, tanFileUrl} =this.state
@@ -169,7 +169,7 @@ class ClientManagment extends Component {
         }
         await SaveClientData(newUserData, authorization)
         setTimeout(async () => {
-            await dispatch(loadMessage());
+            await dispatch(SaveClientDetails([]));
             await GetClientList(0, 20, authorization);
             await this.setState({tanFileUrl : "", gstFileUrl:""})
             clientDetails.Status === "OK" && await alert("Your client details are saved");

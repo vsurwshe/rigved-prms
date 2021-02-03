@@ -3,7 +3,6 @@ import thunk from "redux-thunk";
 import logger from 'redux-logger';
 import { reducer as reduxFormReducer } from 'redux-form';
 import LoginState from "./reducer/LoginState";
-import DashboardState from "./reducer/DashboardState";
 import ClientState from "./reducer/ClientState";
 import FileState from "./reducer/FileState";
 import MasterDataSet from "./reducer/MasterDataState";
@@ -12,6 +11,8 @@ import ProjectState from "./reducer/ProjectState";
 import ExpenseState from"./reducer/ExpenseState";
 import EmpolyeeState from "./reducer/EmployeeState"
 import InvoiceState from "./reducer/InvoiceState"
+import BillingModelState from './reducer/BillingModelState'
+import DashboardState from './reducer/DashboardState';
 
 // this function save state into local storage.
 const saveToLocalStorage=(state)=>{
@@ -47,7 +48,6 @@ const persistedState= loadFormLocalStorgae();
 const reducer = combineReducers({
   form: reduxFormReducer, // mounted under "form"
   LoginState,
-  DashboardState,
   ClientState,
   FileState,
   ProjectState,
@@ -55,14 +55,18 @@ const reducer = combineReducers({
   EmpolyeeState,
   MasterDataSet,
   PurchaseOrderState,
-  InvoiceState
+  InvoiceState,
+  BillingModelState,
+  DashboardState
 });
 
 // this functions apply logger funtionality during development mode 
-const enhancer= compose(applyMiddleware(thunk, logger));
+const enhancer= compose(applyMiddleware(thunk, 
+  logger /* This will logger for redux */
+));
 
 // this is common action through out application will be used
-const initialState = reducer({},{},{},{},{},{},{},{},{})
+const initialState = reducer({},{},{},{},{},{},{},{})
 const rootReducer = (state, action) => {
   if (action.type === 'CLEAR_DATA') {
     state = initialState
@@ -70,7 +74,11 @@ const rootReducer = (state, action) => {
   return reducer(state, action)
 }
 // this function will be createing store
-const store = createStore(rootReducer, persistedState, enhancer);
+const store = createStore(
+  rootReducer, 
+  persistedState, 
+  enhancer
+);
 // this function get the store from local storage
 store.subscribe(()=> saveToLocalStorage(store.getState()))
 

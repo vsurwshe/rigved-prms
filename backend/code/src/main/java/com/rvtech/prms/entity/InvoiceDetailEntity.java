@@ -48,15 +48,16 @@ public class InvoiceDetailEntity extends BaseEntity<String> {
 	@Column
 	private String attendancepermonth;
 
-	
-
 	@Column
 	private Float totalAmt;
 
-	@Column
+	@Column(name = "active", nullable = false, columnDefinition = "tinyint(1) default 1")
 	private Boolean active;
 	
 	@Column
 	private String invoiceId;
+	
+	@Column
+	private String attDetailFrFormula;
 
 }

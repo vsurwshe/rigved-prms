@@ -3,6 +3,8 @@ package com.rvtech.prms.common;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Column;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -54,9 +56,9 @@ public class InvoicePDFDto implements Serializable {
 
 	private Double iGST;
 
-	private Double billWitoutGST;
+	private Float billWitoutGST;
 
-	private Double billWitGST;
+	private Float billWitGST;
 
 	private String totalBillingInWords;
 
@@ -65,5 +67,13 @@ public class InvoicePDFDto implements Serializable {
 	private String emailId = "deepika.singh@rigvedtech.com";
 
 	private String cin = "U74900MH2008PTC186830";
+
+	private Date invoiceDueDate;
+
+	private String paid;
+	
+	private String description;
+	
+	private String billingType;
 
 }

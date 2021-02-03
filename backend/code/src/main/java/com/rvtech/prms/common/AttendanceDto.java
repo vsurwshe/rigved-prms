@@ -24,13 +24,17 @@ public class AttendanceDto {
 	
 	private String companyName;
 	
-	private String dayPresent;
+	private String dayCalculation;
 	
-	private String weekOff;
-	
-	private String halfDay;
-	
-	private String absent;
+	/*
+	 * private String dayPresent;
+	 * 
+	 * private String weekOff;
+	 * 
+	 * private String halfDay;
+	 * 
+	 * private String absent;
+	 */
 	
 	private Date fromDate;
 	

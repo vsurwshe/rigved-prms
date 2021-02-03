@@ -55,6 +55,15 @@ const GetEmployeeList = (firstIndex, lastIndex,authroizationKey) => {
     }
 }
 
+const GetProjectBillingTypeList = (firstIndex, lastIndex,authroizationKey) => {
+    return (dispatch) => {
+        return CreateInstance()
+            .get('/masterdata/billing type/' + firstIndex + '/' + lastIndex, HeaderConfig(authroizationKey))
+            .then(response => { SuccessFunction({ dispatch , "successMethod": saveProjectBillingTypeList, "loadMessage":loadMessage, response}) })
+            .catch(error => { ErrorFunction({dispatch,"loadMessage":loadMessage, error}) })
+    }
+}
+
 const GetRoleList = (firstIndex, lastIndex,authroizationKey) => {
     return (dispatch) => {
         return CreateInstance()
@@ -114,6 +123,13 @@ export function saveRoleList(RoleList){
     }
 }
 
+export function saveProjectBillingTypeList(projectBillingTypeList){
+    return {
+        type:"SAVE_PROJECT_BILLING_LIST",
+        projectBillingTypeList
+    }
+}
+
 export function loadMessage(color, message){
     return{
         type:"SET_NO_DATA",
@@ -130,5 +146,6 @@ export {
     GetManagerList,
     GetExpenseTypeList,
     GetEmployeeList,
-    GetRoleList
+    GetRoleList,
+    GetProjectBillingTypeList
 }

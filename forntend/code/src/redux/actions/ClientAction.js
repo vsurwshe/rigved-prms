@@ -1,6 +1,7 @@
 import { CreateInstance, HeaderConfig } from '../../assets/config/APIConfig';
 import { SuccessFunction, ErrorFunction } from "./CommonAction"
 
+// this method will get client list
 const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -10,6 +11,7 @@ const GetClientList=(firstIndex, lastIndex,authroizationKey)=>{
     }
 }
 
+// this method will save client details
 const SaveClientData=(userData,authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -24,6 +26,7 @@ const SaveClientData=(userData,authroizationKey)=>{
     }
 }
 
+// this method will get client details by id
 const GetClientDetailsById=(clientId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -33,6 +36,7 @@ const GetClientDetailsById=(clientId, authroizationKey)=>{
     }
 }
 
+// this method will delete client details
 const DeleteClient=(clientId, authroizationKey)=>{
     return(dispatch)=>{
         return CreateInstance()
@@ -50,7 +54,6 @@ export function SaveClientList(clientList){
         clientList
     }
 }
-
 
 export function SaveClientDetails(clientDetails){
     return{

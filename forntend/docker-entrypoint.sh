@@ -24,9 +24,10 @@ check_git_available(){
 remove_old_content(){
    if [ "$(ls -A $dir)" ]
     then 
-     mkdir /usr/src/dummy &&
-     cp -a . /usr/src/dummy &&
-     rm -r *
+        echo "Removing old content..." &&
+        cp -af . /usr/src/ &&
+        rm -r * &&
+        echo "Removed old conetent..."
     fi
 }
 
@@ -34,28 +35,32 @@ remove_old_content(){
 fetch_project(){
     inside_git_repo="$(git rev-parse --is-inside-work-tree 2>/dev/null)"
     if [ "$inside_git_repo" ]; then
-      echo "you are inside git repo"
-       git remote set-url origin https://$username:$password@gitlab.com/joshi.rites/rigved-prms.git &&
-       git branch -a &&
-       git fetch origin master
+        echo "You already in git repo"
+        git remote set-url origin https://$username:$password@gitlab.com/joshi.rites/rigved-prms.git &&
+        git branch &&
+        git pull origin dockerBranch &&
+        git log -1 --stat --oneline
     else
-      echo "you are not in git repo"
-      remove_old_content &&
-      git clone -b master https://$username:$password@gitlab.com/joshi.rites/rigved-prms.git .
+        echo "You are not in git repo, pulling git repo"
+        remove_old_content &&
+        git clone -b dockerBranch https://$username:$password@gitlab.com/joshi.rites/rigved-prms.git .
     fi
 }
 
 # this fucntion will used for cleaing and installing dependcies
 install_project_dependancy(){
-    npm -v &&
-    node -v &&
+    echo "Clean NPM Cache..." &&
     npm cache verify && 
     npm cache clean -f && 
-    npm install -g n && 
+    echo "Check the npm version and update npm" &&
+    npm install -g n &&
+    echo "packages installing........" && 
     npm install 
+    echo "packages installed........"
 }
 # this fucntion will used for building project
 build_project(){
+    echo "Project building...." &&
     rm -rf build/ &&
     npm install -g serve &&
     npm run build

@@ -38,4 +38,8 @@ public class ProjectDto {
 	
 	private String purchaseOrderId;
 	
+	private int empCount;
+	
+	private String projectBillingType;
+	
 }

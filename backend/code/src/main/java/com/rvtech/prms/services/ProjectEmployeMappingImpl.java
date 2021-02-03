@@ -67,17 +67,26 @@ public class ProjectEmployeMappingImpl {
 						projectEmployeMappingEntity.getAccountId(), projectEmployeMappingEntity.getAccountId());
 				EmployeeDetailForProjDto dataDto = new EmployeeDetailForProjDto();
 				dataDto = GenericMapper.mapper.map(userInfoEntity, EmployeeDetailForProjDto.class);
-
-				// Fetching rate card name
-				RateCardEntity rateCardEntity = cardRepository.findById(projectEmployeMappingEntity.getRateCardId())
-						.get();
-				dataDto.setCategory(rateCardEntity.getDomainName());
-				dataDto.setToExperience(rateCardEntity.getToYearOfExp());
-				dataDto.setFromExperience(rateCardEntity.getFromYearOfExp());
-				dataDto.setSkill(rateCardEntity.getSkillSet());
+//If ratecard is null or Na then skill and experience is settting from basic employee details
+				if (projectEmployeMappingEntity.getRateCardId() != null
+						&& !projectEmployeMappingEntity.getRateCardId().equals("NA")) {
+					// Fetching rate card name
+					RateCardEntity rateCardEntity = cardRepository.findById(projectEmployeMappingEntity.getRateCardId())
+							.get();
+					dataDto.setCategory(rateCardEntity.getDomainName());
+					dataDto.setToExperience(rateCardEntity.getToYearOfExp());
+					dataDto.setFromExperience(rateCardEntity.getFromYearOfExp());
+					dataDto.setSkill(rateCardEntity.getSkillSet());
+				} else {
+					dataDto.setToExperience((float) 0);
+					dataDto.setFromExperience(userInfoEntity.getExpInYears());
+					dataDto.setSkill(userInfoEntity.getPrimerySkill());
+					dataDto.setDomain(userInfoEntity.getDomain());
+				}
 				dataDto.setOnbordaingDate(projectEmployeMappingEntity.getOnbordaingDate());
 				dataDto.setExitDate(projectEmployeMappingEntity.getExitDate());
 				dataDto.setEmploeeMappedId(projectEmployeMappingEntity.getId());
+
 				list.add(dataDto);
 			}
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
@@ -100,7 +109,7 @@ public class ProjectEmployeMappingImpl {
 						&& employeeDetailForProjDto.getRateCardId() != null) {
 					int count = projectEmployeMappingRepository.countOnProjectIdAndAccountId(
 							projectEmployeMappingDto.getProjectId(), employeeDetailForProjDto.getAccountId());
-					if(count>0) {
+					if (count > 0) {
 						responceMap = new HashMap<String, Object>();
 						headers = Utilities.getDefaultHeader();
 

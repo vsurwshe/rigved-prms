@@ -11,9 +11,9 @@ import ClientManagment from '../views/client/ClientManagement';
 import PurchaseOrderManagement from '../views/purchaseOrder/PurchaseOrderManagement';
 import ProjectManagement from '../views/project/ProjectManagement';
 import PurchaseOrderFrom from '../views/purchaseOrder/PurchaseOrderFrom';
-import InvoiceManagement from '../views/invoice/InvoiceManagement'
-import Dashboard from '../views/dashboard/Dashboard';
- 
+import InvoiceManagement from '../views/invoice/InvoiceManagement';
+import Dashboard from '../views/dashborad/Dashborad';
+
 const RoutesPath=[
     {path:"/",component: Dashboard, exact: true},
     {path:"/register",component: UserManagement},

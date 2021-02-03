@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.mail.search.SearchTerm;
 import javax.transaction.Transactional;
 
 import org.modelmapper.ModelMapper;
@@ -55,10 +56,12 @@ public class ProjectServiceImpl {
 				headers.add(Constants.MESSAGE, "Expens Detail created successfully");
 				responceMap.put("Id", projectEntity.getId());
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Expens Detail created successfully");
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 				headers.add(Constants.MESSAGE, "Something went wrong");
 				responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+				responceMap.put(Constants.MESSAGE, "Something went wrong");
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -66,6 +69,8 @@ public class ProjectServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
@@ -75,6 +80,7 @@ public class ProjectServiceImpl {
 	public ResponseEntity<List<ProjectDto>> projectList(int pageIndex, int pageSize, String projectName) {
 		List<ProjectDto> list = new ArrayList<ProjectDto>();
 		List<ProjectEntity> projEntitylist;
+		responceMap = new HashMap<String, Object>();
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		headers = Utilities.getDefaultHeader();
 		if (projectName == null || projectName.equals("")) {
@@ -87,11 +93,14 @@ public class ProjectServiceImpl {
 		for (ProjectEntity projectEntity : projEntitylist) {
 			// ExpenseDto expenseDto=new ExpenseDto();
 			ProjectDto projectDto = GenericMapper.mapper.map(projectEntity, ProjectDto.class);
+			projectDto.setEmpCount(projectRepository.employeeCount(projectDto.getId()));
 			list.add(projectDto);
 		}
 		if (list != null && list.isEmpty()) {
 			headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
+			responceMap.put(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm " + projectName);
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Document Found Successfully For SearchTerm");
@@ -111,10 +120,14 @@ public class ProjectServiceImpl {
 				headers.add(Constants.STATUS, HttpStatus.OK.toString());
 				headers.add(Constants.MESSAGE, "Project deleted successfully");
 				responceMap.put("Status", HttpStatus.OK);
+				responceMap.put(Constants.MESSAGE, "Project deleted successfully");
+
 			} else {
 				headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 				headers.add(Constants.MESSAGE, "No data available");
 				responceMap.put("Status", HttpStatus.NO_CONTENT);
+				responceMap.put(Constants.MESSAGE, "No data available");
+
 			}
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -122,6 +135,8 @@ public class ProjectServiceImpl {
 			headers.add(Constants.STATUS, HttpStatus.INTERNAL_SERVER_ERROR.toString());
 			headers.add(Constants.MESSAGE, "Something went wrong");
 			responceMap.put("Status", HttpStatus.INTERNAL_SERVER_ERROR);
+			responceMap.put(Constants.MESSAGE, "Something went wrong");
+
 		}
 		return new ResponseEntity<>(responceMap, headers, HttpStatus.OK);
 	}

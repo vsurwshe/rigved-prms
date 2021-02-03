@@ -27,13 +27,16 @@ public class InvoiceDetailDto implements Serializable {
 
 	private String attendancepermonth;
 
-	private List<CommanDto> monthAttendanceLiat;
+	//private List<CommanDto> monthAttendanceLiat;
 
-	private Float totalInvPerEmp;
+	//private Float totalInvPerEmp;
 
 	private Float totalAmt;
 
 	private Boolean active;
 	
+	private String invoiceId;
+
+	private String attDetailFrFormula;
 
 }

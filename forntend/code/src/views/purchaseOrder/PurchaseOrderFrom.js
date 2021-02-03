@@ -12,7 +12,7 @@ import { bindActionCreators } from 'redux';
 
 let PurchaseOrderForm = (props) => {
     var classes = useStyles();
-    const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, initialValues, clearFile } = props
+    const { SaveMethod, pristine, reset, submitting, handleSubmit, cancle, clearFile } = props
     const { operation } = props.stateData
     return <div className={classes.girdContainer}>
         <form onSubmit={handleSubmit(SaveMethod)}>
@@ -20,7 +20,7 @@ let PurchaseOrderForm = (props) => {
             <div className={classes.buttonStyle}>
                 <center>
                     {(operation === FromActions.CR || operation === FromActions.ED) && <>
-                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> {(initialValues === undefined) ? "SUBMIT" : "EDIT"}</Button> &nbsp;&nbsp;
+                    <Button type="submit" variant="outlined" color="primary" disabled={pristine || submitting}> SUBMIT </Button> &nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" disabled={pristine || submitting} onClick={reset}> Clear Values</Button></>}&nbsp;&nbsp;
                     <Button type="button" variant="outlined" color="secondary" onClick={async () => { await clearFile(); await reset(); cancle() }}> Cancel</Button>
                 </center>
@@ -60,7 +60,7 @@ const SectionOne = (data) => {
     return <>
         {operation === FromActions.CR ? LoadFields({ classes,"mainProps":data.props }) : LoadHeader({ classes, initialValues })}
         {operation === FromActions.CR &&
-            <>{(purchaseOrderFileUpload) ? renderLoading({message:"Uploading...", size:40})
+            <>{(purchaseOrderFileUpload) ? renderLoading({message:"Uploading", size:80})
                 : (purchaseOrderFileUrl ? LoadFileUrl({ "url": purchaseOrderFileUrl, "cid": 1, "mainProps": data.props, "componentName": "Purchase Order Image", "style": { height: "50%", width: "70%" } })
                     : <Field name="poCntrUrl" component={renderFileInput} fullWidth type="file" successFunction={uploadFile} lable="Purchase Order File" />)
             }</>}

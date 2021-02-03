@@ -25,7 +25,7 @@ public interface ProjectEmployeMappingRepository extends CrudRepository<ProjectE
 
 	List<ProjectEmployeMappingEntity> findAllByActive(Boolean active, Pageable page);
 
-	List<ProjectEmployeMappingEntity> findAllByProjectId(String projectId);
+	List<ProjectEmployeMappingEntity> findAllByProjectIdAndActiveTrue(String projectId);
 
 	@Query("SELECT count(*) FROM ProjectEmployeMappingEntity where projectId=:projectId and accountId=:accountId and active=1")
 	int countOnProjectIdAndAccountId(@Param("projectId") String projectId, @Param("accountId") String accountId);

@@ -3,7 +3,10 @@ package com.rvtech.prms.services;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,9 +47,12 @@ public class MasterDataServiceImpl {
 
 	private List<MasterDataEntity> masterTypeEntities;
 
+	private Map<String, Object> responceMap;
+
 	public ResponseEntity<List<MasterDataDto>> search(String searchType, int pageIndex, int pageSize,
 			String searchTerm) {
 		List<MasterDataDto> list = new ArrayList<MasterDataDto>();
+		responceMap = new HashMap<String, Object>();
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		headers = Utilities.getDefaultHeader();
 		if (searchTerm == null || searchTerm.equals("")) {
@@ -67,6 +73,9 @@ public class MasterDataServiceImpl {
 		if (list != null && list.isEmpty()) {
 			headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
+			responceMap.put(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm " + searchTerm);
+			return new ResponseEntity<>(list, headers, HttpStatus.OK);
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Document Found Successfully For SearchTerm");
@@ -79,6 +88,7 @@ public class MasterDataServiceImpl {
 		List<UserInfoEntity> managerList;
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		headers = Utilities.getDefaultHeader();
+		responceMap = new HashMap<String, Object>();
 		if (searchTerm == null || searchTerm.equals("")) {
 			managerList = (List<UserInfoEntity>) userInfoRepository
 					.findByFirstNameContainingOrLastNameContainingAndUserTypeContaining(searchTerm, searchTerm,
@@ -97,6 +107,9 @@ public class MasterDataServiceImpl {
 		if (list != null && list.isEmpty()) {
 			headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
+			responceMap.put(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm " + searchTerm);
+			return new ResponseEntity<>(list, headers, HttpStatus.OK);
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Document Found Successfully For SearchTerm");
@@ -106,7 +119,8 @@ public class MasterDataServiceImpl {
 
 	public ResponseEntity<?> searchEmployee(int pageIndex, int pageSize, String searchTerm) {
 		List<UserDisplayInfoDto> list = new ArrayList<UserDisplayInfoDto>();
-		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-dd-mm");
+		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-dd-MM");
+		responceMap = new HashMap<String, Object>();
 		List<UserInfoEntity> managerList;
 		Pageable page = PageRequest.of(pageIndex, pageSize);
 		headers = Utilities.getDefaultHeader();
@@ -127,9 +141,9 @@ public class MasterDataServiceImpl {
 			try {
 				String attendanceFromToDate = attendanceRepository.findAttendanceToAndFromDate(dataDto.getAccountId());
 				String[] stringArray = attendanceFromToDate != null ? attendanceFromToDate.split(",") : null;
-				dataDto.setLatestAttFromDate(stringArray == null ? null : dateFormat.parse(stringArray[0]));
-				dataDto.setLatestAttToDate(stringArray == null ? null : dateFormat.parse(stringArray[1]));
-			} catch (ParseException e) {
+				dataDto.setLatestAttFromDate(stringArray == null ? null : stringArray[0]);
+				dataDto.setLatestAttToDate(stringArray == null ? null : stringArray[1]);
+			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				logger.error("Attendence search");
 			}
@@ -138,6 +152,9 @@ public class MasterDataServiceImpl {
 		if (list != null && list.isEmpty()) {
 			headers.add(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
 			headers.add(Constants.MESSAGE, "No Data Found For SearchTerm");
+			responceMap.put(Constants.STATUS, HttpStatus.NO_CONTENT.toString());
+			responceMap.put(Constants.MESSAGE, "No Data Found For SearchTerm " + searchTerm);
+			return new ResponseEntity<>(list, headers, HttpStatus.OK);
 		} else {
 			headers.add(Constants.STATUS, HttpStatus.OK.toString());
 			headers.add(Constants.MESSAGE, "Document Found Successfully For SearchTerm");
