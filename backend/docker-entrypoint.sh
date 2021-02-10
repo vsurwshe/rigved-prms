@@ -36,7 +36,7 @@ fetch_project(){
        git log -1 --stat --oneline
     else
       echo "you are not in git repo"
-      remove_old_content &&
+      # remove_old_content &&
       git clone -b master https://$username:$password@gitlab.com/joshi.rites/rigved-prms-backend.git .
     fi
 }

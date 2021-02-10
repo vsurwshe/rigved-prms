@@ -42,7 +42,7 @@ fetch_project(){
         git log -1 --stat --oneline
     else
         echo "You are not in git repo, pulling git repo"
-        remove_old_content &&
+        # remove_old_content &&
         git clone -b dockerBranch https://$username:$password@gitlab.com/joshi.rites/rigved-prms.git .
     fi
 }
