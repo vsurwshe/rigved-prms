@@ -25,8 +25,7 @@ remove_old_content(){
    if [ "$(ls -A $dir)" ]
     then 
         echo "Removing old content..." &&
-        # cp -af . /usr/src/ &&
-        rm -r * &&
+        [ "$(ls -A $dir)" ] &&  rm -rf ..?* .[!.]* * || echo "DIR is Empty"
         echo "Removed old conetent..."
     fi
 }

@@ -65,7 +65,7 @@ dependencies {
 	compile group: 'org.apache.poi', name: 'poi-ooxml', version: '3.9'
 	compile group: 'org.apache.poi', name: 'poi-ooxml-schemas', version: '3.9'
 	compile group: 'org.apache.xmlbeans', name: 'xmlbeans', version: '2.3.0'
-	
+	compile group: 'javax.mail', name: 'mail', version: '1.4.1'
 	
 	
 	compile("org.springframework.boot:spring-boot-starter") {

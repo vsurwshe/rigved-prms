@@ -19,9 +19,9 @@ check_git_available(){
 remove_old_content(){
    if [ "$(ls -A $dir)" ]
     then 
-    #  mkdir /home/dummy &&
-     cp -af . /home/ &&
-     rm -r *
+        echo "Removing old content..." &&
+        [ "$(ls -A $dir)" ] &&  rm -rf ..?* .[!.]* * || echo "DIR is Empty"
+        echo "Removed old conetent..."
     fi
 }
 
@@ -36,7 +36,7 @@ fetch_project(){
        git log -1 --stat --oneline
     else
       echo "you are not in git repo"
-      # remove_old_content &&
+      remove_old_content &&
       git clone -b master https://$username:$password@gitlab.com/joshi.rites/rigved-prms-backend.git .
     fi
 }
